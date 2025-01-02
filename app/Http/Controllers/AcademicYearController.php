@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class AcademicYearController extends Controller
 {
@@ -15,7 +16,7 @@ class AcademicYearController extends Controller
     {
         //
         $academicYears = AcademicYear::all();
-        return response()->json($academicYears, 200);
+        return response()->json($academicYears, Response::HTTP_OK);
     }
 
     /**
@@ -49,12 +50,12 @@ class AcademicYearController extends Controller
         ]);
 
         if ($validate->fails()) {
-            return response()->json($validate->errors(), 422);
+            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         AcademicYear::create($request->all());
 
-        return response()->json(["message" => "The $request->year academic year has been successfully created"], 201);
+        return response()->json(["message" => "The $request->year academic year has been successfully created"], Response::HTTP_CREATED);
     }
 
     /**
@@ -63,14 +64,14 @@ class AcademicYearController extends Controller
     public function show(AcademicYear $academicYear)
     {
         //
-        return response()->json($academicYear, 200);
+        return response()->json($academicYear, Response::HTTP_OK);
     }
 
     public function lastYear()
     {
         $lastYear = AcademicYear::latest('year')->first();
         if ($lastYear) {
-            return response()->json($lastYear, 200);
+            return response()->json($lastYear, Response::HTTP_OK);
         } else {
             return response()->json(['message' => 'Academic year not found'], 404);
         }
@@ -112,7 +113,7 @@ class AcademicYearController extends Controller
 
         $academicYear->update($request->all());
 
-        return response()->json(["message" => "the $academicYear->year academic year has been successfully updated"], 200);
+        return response()->json(["message" => "the $academicYear->year academic year has been successfully updated"], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -122,6 +123,6 @@ class AcademicYearController extends Controller
     {
         //
         $academicYear->delete();
-        return response()->json(["message" => "the $academicYear->year academic year has been successfully deleted"], 200);
+        return response()->json(["message" => "the $academicYear->year academic year has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }
