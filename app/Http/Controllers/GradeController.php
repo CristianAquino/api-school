@@ -36,7 +36,7 @@ class GradeController extends Controller
         }
 
         // Grade::create($request->all());
-        $level->grades()->save(new Grade($request->all()));
+        $level->grades()->create($request->only['grade']);
 
         return response()->json(["message" => "The grade $request->grade has been successfully created"], Response::HTTP_CREATED);
     }
@@ -66,7 +66,7 @@ class GradeController extends Controller
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $level->grades()->find($grade->id)->update($request->all());
+        $level->grades()->find($grade->id)->update($request->only(['grade']));
 
         return response()->json(["message" => "The grade $grade->grade has been successfully updated to $request->grade"], Response::HTTP_ACCEPTED);
     }
@@ -79,6 +79,6 @@ class GradeController extends Controller
         //
         $level->grades()->find($grade->id)->delete();
 
-        return response()->json(["message" => "The grade $grade->grade has been successfully deleted from level " . $grade->level->level], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "The grade $grade->grade has been successfully deleted from level " . $level->level], Response::HTTP_ACCEPTED);
     }
 }

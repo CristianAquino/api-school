@@ -43,7 +43,7 @@ class LevelController extends Controller
             return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        Level::create($request->all());
+        Level::create($request->only(['level']));
 
         return response()->json(["message" => "The level $request->level has been successfully created"], Response::HTTP_CREATED);
     }
@@ -82,7 +82,7 @@ class LevelController extends Controller
             return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $level->update($request->all());
+        $level->update($request->only(['level']));
 
         return response()->json(["message" => "The level $level->level has been successfully updated to $request->level"], Response::HTTP_ACCEPTED);
     }
@@ -94,6 +94,7 @@ class LevelController extends Controller
     {
         //
         $level->delete();
+
         return response()->json(["message" => "The level $level->level has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }
