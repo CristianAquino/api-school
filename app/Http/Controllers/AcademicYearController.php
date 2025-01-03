@@ -26,7 +26,7 @@ class AcademicYearController extends Controller
     {
         //
         $validate = Validator::make($request->all(), [
-            'year' => 'required|string|unique:academic_years',
+            'year' => 'required|string|unique:academic_years,year',
             'start_date' => [
                 'required',
                 'date',
@@ -55,7 +55,7 @@ class AcademicYearController extends Controller
 
         AcademicYear::create($request->all());
 
-        return response()->json(["message" => "The $request->year academic year has been successfully created"], Response::HTTP_CREATED);
+        return response()->json(["message" => "The academic year $request->year has been successfully created"], Response::HTTP_CREATED);
     }
 
     /**
@@ -84,7 +84,7 @@ class AcademicYearController extends Controller
     {
         //
         $validate = Validator::make($request->all(), [
-            'year' => 'required|string|unique:academic_years,year,' . $academicYear->id,
+            'year' => 'required|string|unique:academic_years,year' . $academicYear->id,
             'start_date' => [
                 'required',
                 'date',
@@ -113,7 +113,7 @@ class AcademicYearController extends Controller
 
         $academicYear->update($request->all());
 
-        return response()->json(["message" => "the $academicYear->year academic year has been successfully updated"], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "the academic year $academicYear->year has been successfully updated"], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -123,6 +123,6 @@ class AcademicYearController extends Controller
     {
         //
         $academicYear->delete();
-        return response()->json(["message" => "the $academicYear->year academic year has been successfully deleted"], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "the academic year $academicYear->year has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }

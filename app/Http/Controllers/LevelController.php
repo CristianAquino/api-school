@@ -33,7 +33,7 @@ class LevelController extends Controller
                 function ($attribute, $value, $fail) {
                     $exists = Level::whereRaw('LOWER(level) = ?', strtolower($value))->exists();
                     if ($exists) {
-                        $fail("The $value level already exists.");
+                        $fail("The level $value already exists.");
                     }
                 }
             ],
@@ -45,7 +45,7 @@ class LevelController extends Controller
 
         Level::create($request->all());
 
-        return response()->json(["message" => "The $request->level level has been successfully created"], Response::HTTP_CREATED);
+        return response()->json(["message" => "The level $request->level has been successfully created"], Response::HTTP_CREATED);
     }
 
     /**
@@ -72,7 +72,7 @@ class LevelController extends Controller
                 function ($attribute, $value, $fail) {
                     $exists = Level::whereRaw('LOWER(level) = ?', strtolower($value))->exists();
                     if ($exists) {
-                        $fail("The $value level already exists.");
+                        $fail("The level $value already exists.");
                     }
                 }
             ],
@@ -84,7 +84,7 @@ class LevelController extends Controller
 
         $level->update($request->all());
 
-        return response()->json(["message" => "The $request->level level has been successfully updated"], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "The level $level->level has been successfully updated to $request->level"], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -94,6 +94,6 @@ class LevelController extends Controller
     {
         //
         $level->delete();
-        return response()->json(["message" => "The $level->level level has been successfully deleted"], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "The level $level->level has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }
