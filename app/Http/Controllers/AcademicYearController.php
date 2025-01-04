@@ -53,7 +53,7 @@ class AcademicYearController extends Controller
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        AcademicYear::create($request->only(['year', 'start_date', 'end_date']));
+        AcademicYear::create($validate->validated());
 
         return response()->json(["message" => "The academic year $request->year has been successfully created"], Response::HTTP_CREATED);
     }
@@ -111,7 +111,7 @@ class AcademicYearController extends Controller
             return response()->json($validate->errors(), 422);
         }
 
-        $academicYear->update($request->only(['year', 'start_date', 'end_date']));
+        $academicYear->update($validate->validated());
 
         return response()->json(["message" => "the academic year $academicYear->year has been successfully updated"], Response::HTTP_ACCEPTED);
     }

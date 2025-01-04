@@ -34,7 +34,8 @@ class CourseController extends Controller
         if ($validate->fails()) {
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        $grade->courses()->create($request->only(['course', 'description']));
+
+        $grade->courses()->create($validate->validated());
 
         return response()->json(["message" => "The course $request->course has been successfully created"], Response::HTTP_CREATED);
     }
@@ -46,6 +47,7 @@ class CourseController extends Controller
     {
         //
         $course = $grade->courses()->find($course->id);
+
         return response()->json($course, Response::HTTP_OK);
     }
 
@@ -64,7 +66,7 @@ class CourseController extends Controller
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $grade->courses()->find($course->id)->update($request->only(['course', 'description']));
+        $grade->courses()->find($course->id)->update($validate->validated());
 
         return response()->json(["message" => "The course $course->course has been successfully updated"], Response::HTTP_ACCEPTED);
     }

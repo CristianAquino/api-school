@@ -28,15 +28,13 @@ class GradeController extends Controller
         //
         $validate = Validator::make($request->all(), [
             'grade' => 'required|string|max:32',
-            // 'level_id' => 'required|exists:levels,id',
         ]);
 
         if ($validate->fails()) {
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // Grade::create($request->all());
-        $level->grades()->create($request->only['grade']);
+        $level->grades()->create($validate->validated());
 
         return response()->json(["message" => "The grade $request->grade has been successfully created"], Response::HTTP_CREATED);
     }
@@ -66,7 +64,7 @@ class GradeController extends Controller
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $level->grades()->find($grade->id)->update($request->only(['grade']));
+        $level->grades()->find($grade->id)->update($validate->validated());
 
         return response()->json(["message" => "The grade $grade->grade has been successfully updated to $request->grade"], Response::HTTP_ACCEPTED);
     }
@@ -79,6 +77,6 @@ class GradeController extends Controller
         //
         $level->grades()->find($grade->id)->delete();
 
-        return response()->json(["message" => "The grade $grade->grade has been successfully deleted from level " . $level->level], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "The grade $grade->grade has been successfully deleted from level $level->level"], Response::HTTP_ACCEPTED);
     }
 }

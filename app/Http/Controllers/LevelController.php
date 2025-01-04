@@ -25,7 +25,7 @@ class LevelController extends Controller
     public function store(Request $request)
     {
         //
-        $validator = Validator::make($request->all(), [
+        $validate = Validator::make($request->all(), [
             'level' => [
                 'required',
                 'string',
@@ -39,11 +39,11 @@ class LevelController extends Controller
             ],
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        if ($validate->fails()) {
+            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        Level::create($request->only(['level']));
+        Level::create($validate->validated());
 
         return response()->json(["message" => "The level $request->level has been successfully created"], Response::HTTP_CREATED);
     }
@@ -64,7 +64,7 @@ class LevelController extends Controller
     public function update(Request $request, Level $level)
     {
         //
-        $validator = Validator::make($request->all(), [
+        $validate = Validator::make($request->all(), [
             'level' => [
                 'required',
                 'string',
@@ -78,11 +78,11 @@ class LevelController extends Controller
             ],
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        if ($validate->fails()) {
+            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $level->update($request->only(['level']));
+        $level->update($validate->validated());
 
         return response()->json(["message" => "The level $level->level has been successfully updated to $request->level"], Response::HTTP_ACCEPTED);
     }
