@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('academic_years', function (Blueprint $table) {
             $table->id();
-            $table->string('year')->unique()->default(date("Y"));
+            $table->string('year', 4)->unique()->default(date("Y"));
             $table->date('start_date')->default(date("Y/m/d"));
             $table->date('end_date')->default(date("Y/12/31"));
             $table->timestamps();

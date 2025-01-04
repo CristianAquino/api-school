@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Schedule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grades', function (Blueprint $table) {
+        Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->string('grade', 32);
-            $table->foreignId('level_id')->constrained('levels')->onDelete('restrict');
+            $table->time('start_time')->default('08:00:00');
+            $table->time('end_time')->default('09:00:00');
+            $table->enum('day', Schedule::DAYS);
+            $table->foreignId('course_id')->constrained('courses')->onDelete('restrict');
             $table->timestamps();
         });
     }
@@ -25,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('grades');
+        Schema::dropIfExists('schedules');
         Schema::enableForeignKeyConstraints();
     }
 };
