@@ -55,7 +55,7 @@ class TeacherController extends Controller
         ]);
 
         $new_datos = $validate->validated();
-        $new_datos['password'] = $validate->validated()['first_name'] . '1234';
+        $new_datos['password'] = $code . '1234';
 
         $teacher->user()->create($new_datos);
 
