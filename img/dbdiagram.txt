@@ -1,0 +1,99 @@
+// los años son unicos y tienen que
+// estar previamente definidos
+// recordar que al registrar se tiene
+// que tomar el ultimo año creado
+Table academic_years{
+  id integer [primary key]
+  year string 
+  start_date date
+  end_date date
+  created_at timestamp
+}
+// pensar en colocar solamente
+// mediante texto los grados y secciones
+Table enrollments{
+  id uuid [primary key]
+  academic_year_id integer
+  student_id uuid
+  grade_id integer
+  created_at timestamp
+}
+Table grades {
+  id integer [primary key]
+  name string
+  level_id integer
+  created_at timestamp
+}
+Table levels {
+  id integer [primary key]
+  level string  
+  created_at timestamp
+}
+Table students {
+  id uuid [primary key]
+  names string
+  first_name string
+  second_name string
+  code_student string
+  phone string
+  birth_date date
+  address string
+  email email
+  dni string
+  created_at timestamp 
+}
+// total sera una variable env
+// la cual sera el total de notas
+// tener en cuenta que avg
+// sera = note_number/total
+// en el frontend se realizara
+// la suma de avg para ya no 
+// realizar la operacion de promedio
+Table qualifications {
+  id integer [primary key]
+  number_note float
+  letter_note string
+  avg float
+  student_id uuid
+  course_id integer
+  created_at timestamp
+}
+Table courses {
+  id integer [primary key]
+  name string
+  description string
+  teacher_id uuid
+  grade_id integer
+  created_at timestamp
+}
+Table schedules {
+  id integer [primary key]
+  start_hour time
+  end_hour time
+  day varchar
+  course_id integer
+  created_at timestamp
+}
+Table teachers {
+  id uuid [primary key]
+  names string
+  first_name string
+  second_name string
+  code_teacher string
+  phone string
+  birth_date date
+  address string
+  email email
+  dni string
+  created_at timestamp
+}
+
+Ref: academic_years.id < enrollments.academic_year_id // many-to-one
+Ref: grades.id < enrollments.grade_id
+Ref: students.id <enrollments.student_id 
+Ref: students.id < qualifications.student_id
+Ref: courses.id < qualifications.course_id
+Ref: teachers.id < courses.teacher_id
+Ref: courses.id < schedules.course_id
+Ref: grades.id < courses.grade_id
+Ref: levels.id< grades.level_id
