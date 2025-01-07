@@ -53,8 +53,15 @@ class AcademicYearController extends Controller
     public function update(Request $request, AcademicYear $academicYear)
     {
         //
+        $year = $academicYear->year;
+
         $academicYear->update($request->validated_data);
-        return response()->json(["message" => "the academic year $academicYear->year has been successfully updated"], Response::HTTP_ACCEPTED);
+
+        if ($academicYear->year == $year) {
+            return response()->json(["message" => "the academic year $year has been successfully updated"], Response::HTTP_ACCEPTED);
+        } else {
+            return response()->json(["message" => "the academic year $year has been successfully updated to $academicYear->year"], Response::HTTP_ACCEPTED);
+        }
     }
 
     /**

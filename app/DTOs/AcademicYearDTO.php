@@ -8,10 +8,10 @@ class AcademicYearDTO
      * Create a new class instance.
      */
     public function __construct(
-        public int $id,
-        public string $year,
-        public string $start_date,
-        public string $end_date
+        public readonly int $id,
+        public readonly string $year,
+        public readonly string $start_date,
+        public readonly string $end_date
     ) {
         //
     }
