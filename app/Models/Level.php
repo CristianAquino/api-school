@@ -13,7 +13,6 @@ class Level extends Model
     // relations
     public function grades()
     {
-
-        return $this->hasMany(Grade::class);
+        return $this->belongsToMany(Grade::class)->withPivot('id')->withTimestamps();
     }
 }

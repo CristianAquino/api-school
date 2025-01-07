@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\LevelDTO;
 use App\Models\Level;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class LevelController extends Controller
@@ -16,7 +16,8 @@ class LevelController extends Controller
     {
         //
         $levels = Level::all();
-        return response()->json($levels, Response::HTTP_OK);
+        $levelsDTO = LevelDTO::fromNotRelationCollection($levels);
+        return response()->json($levelsDTO, Response::HTTP_OK);
     }
 
     /**
@@ -24,27 +25,8 @@ class LevelController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $validate = Validator::make($request->all(), [
-            'level' => [
-                'required',
-                'string',
-                'max:64',
-                function ($attribute, $value, $fail) {
-                    $exists = Level::whereRaw('LOWER(level) = ?', strtolower($value))->exists();
-                    if ($exists) {
-                        $fail("The level $value already exists.");
-                    }
-                }
-            ],
-        ]);
-
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        Level::create($validate->validated());
-
+        // 
+        Level::create($request->validated_data);
         return response()->json(["message" => "The level $request->level has been successfully created"], Response::HTTP_CREATED);
     }
 
@@ -54,8 +36,7 @@ class LevelController extends Controller
     public function show(Level $level)
     {
         //
-        $level->load('grades');
-        return response()->json($level, Response::HTTP_OK);
+        return response()->json(LevelDTO::fromModel($level), Response::HTTP_OK);
     }
 
     /**
@@ -64,27 +45,11 @@ class LevelController extends Controller
     public function update(Request $request, Level $level)
     {
         //
-        $validate = Validator::make($request->all(), [
-            'level' => [
-                'required',
-                'string',
-                'max:64',
-                function ($attribute, $value, $fail) {
-                    $exists = Level::whereRaw('LOWER(level) = ?', strtolower($value))->exists();
-                    if ($exists) {
-                        $fail("The level $value already exists.");
-                    }
-                }
-            ],
-        ]);
+        $lev = $level->level;
 
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
+        $level->update($request->validated_data);
 
-        $level->update($validate->validated());
-
-        return response()->json(["message" => "The level $level->level has been successfully updated to $request->level"], Response::HTTP_ACCEPTED);
+        return response()->json(["message" => "The level $lev has been successfully updated to $request->level"], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -94,7 +59,6 @@ class LevelController extends Controller
     {
         //
         $level->delete();
-
         return response()->json(["message" => "The level $level->level has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }
