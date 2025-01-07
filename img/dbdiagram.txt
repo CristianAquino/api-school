@@ -15,7 +15,7 @@ Table enrollments{
   id uuid [primary key]
   academic_year_id integer
   student_id uuid
-  grade_id integer
+  grade_level_id int
   created_at timestamp
 }
 Table grades {
@@ -63,7 +63,7 @@ Table courses {
   name string
   description string
   teacher_id uuid
-  grade_id integer
+  grade_level_id int
   created_at timestamp
 }
 Table schedules {
@@ -87,13 +87,20 @@ Table teachers {
   dni string
   created_at timestamp
 }
+Table grades_levels {
+  id int [primary key]
+  grade_id int
+  level_id int
+  created_at timestamp
+}
 
 Ref: academic_years.id < enrollments.academic_year_id // many-to-one
-Ref: grades.id < enrollments.grade_id
+Ref: grades_levels.id < enrollments.grade_level_id
 Ref: students.id <enrollments.student_id 
 Ref: students.id < qualifications.student_id
 Ref: courses.id < qualifications.course_id
 Ref: teachers.id < courses.teacher_id
 Ref: courses.id < schedules.course_id
-Ref: grades.id < courses.grade_id
-Ref: levels.id< grades.level_id
+Ref: grades_levels.id < courses.grade_level_id 
+Ref: grades.id < grades_levels.grade_id
+Ref: levels.id < grades_levels.level_id
