@@ -2,35 +2,37 @@
 
 namespace App\DTOs;
 
-class LevelDTO
+class GradeDTO
 {
     /**
      * Create a new class instance.
      */
     public function __construct(
         public readonly int $id,
+        public readonly string $grade,
         public readonly string $level,
-        public readonly array $grades
+        public readonly array $courses = [],
     ) {
         //
     }
 
-    public static function fromModel($model): self
+    public static function fromModel($grade, $level, $courses): self
     {
-        $grades = GradeDTO::fromNotRelationCollection($model->grades);
+        $courses = CourseDTO::fromCollection($courses);
 
         return new self(
-            $model->id,
-            $model->level,
-            $grades
+            $grade->id,
+            $grade->grade,
+            $level->level,
+            $courses
         );
     }
 
-    public static function fromNotRelationModel($models): array
+    public static function fromNotRelationModel($model): array
     {
         return [
-            'id' => $models->id,
-            'level' => $models->level,
+            'id' => $model->id,
+            'grade' => $model->grade,
         ];
     }
 

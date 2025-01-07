@@ -15,9 +15,9 @@ class Grade extends Model
     {
         return $this->hasMany(Enrollement::class);
     }
-    public function level()
+    public function levels()
     {
-        return $this->belongsTo(Level::class);
+        return $this->belongsToMany(Level::class)->withTimestamps()->withPivot('id');
     }
     public function courses()
     {
