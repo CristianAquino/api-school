@@ -16,7 +16,22 @@ class GradeDTO
         //
     }
 
-    public static function fromModel($grade, $level, $courses): self
+    public static function fromModel($model): array
+    {
+        return [
+            'id' => $model->id,
+            'grade' => $model->grade,
+        ];
+    }
+
+    public static function fromCollection($collections): array
+    {
+        return array_map(function ($collection) {
+            return self::fromModel($collection);
+        }, $collections->all());
+    }
+
+    public static function fromModelWithRelation($grade, $level, $courses): self
     {
         $courses = CourseDTO::fromCollection($courses);
 
@@ -26,20 +41,5 @@ class GradeDTO
             $level->level,
             $courses
         );
-    }
-
-    public static function fromNotRelationModel($model): array
-    {
-        return [
-            'id' => $model->id,
-            'grade' => $model->grade,
-        ];
-    }
-
-    public static function fromNotRelationCollection($collections): array
-    {
-        return array_map(function ($collection) {
-            return self::fromNotRelationModel($collection);
-        }, $collections->all());
     }
 }

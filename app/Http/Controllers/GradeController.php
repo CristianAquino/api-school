@@ -18,7 +18,7 @@ class GradeController extends Controller
     {
         //
         $grades = Grade::all();
-        $gradesDTO = GradeDTO::fromNotRelationCollection($grades);
+        $gradesDTO = GradeDTO::fromCollection($grades);
         return response()->json($gradesDTO, Response::HTTP_OK);
     }
 
@@ -63,7 +63,7 @@ class GradeController extends Controller
         // $courses = Course::where('grade_level_id', $gra->pivot->id)->get();
         $courses = GradeLevel::where('level_id', $level->id)->where('grade_id', $grade->id)->first()->course;
 
-        $relation = GradeDTO::fromModel($grade, $level, $courses);
+        $relation = GradeDTO::fromModelWithRelation($grade, $level, $courses);
         return response()->json($relation, Response::HTTP_OK);
     }
 
