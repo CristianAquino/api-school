@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\CourseDTO;
 use App\Models\Course;
 use App\Models\Grade;
+use App\Models\GradeLevel;
+use App\Models\Level;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class CourseController extends Controller
@@ -13,29 +15,25 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Grade $grade)
+    public function index()
     {
         //
-        $courses = $grade->courses;
-        return response()->json($courses, Response::HTTP_OK);
+        $courses = Course::all();
+        $coursesDTO = CourseDTO::fromCollection($courses);
+        return response()->json($coursesDTO, Response::HTTP_OK);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Grade $grade)
+    public function store(Request $request, Level $level, Grade $grade)
     {
         //
-        $validate = Validator::make($request->all(), [
-            'course' => 'required|string|max:64',
-            'description' => 'nullable|string|max:128'
-        ]);
+        $relation = GradeLevel::where('grade_id', $grade->id)->where('level_id', $level->id)->first();
 
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        $grade->courses()->create($validate->validated());
+        $course = new Course($request->validated_data);
+        $course->grade_level_id = $relation->id;
+        $course->save();
 
         return response()->json(["message" => "The course $request->course has been successfully created"], Response::HTTP_CREATED);
     }
@@ -43,30 +41,20 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Grade $grade, Course $course)
+    public function show(Course $course)
     {
         //
-        $course = $grade->courses()->find($course->id);
-
-        return response()->json($course, Response::HTTP_OK);
+        $coursesDTO = CourseDTO::fromModelWithRelation($course);
+        return response()->json($coursesDTO, Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Grade $grade, Course $course)
+    public function update(Request $request, Course $course)
     {
         //
-        $validate = Validator::make($request->all(), [
-            'course' => 'required|string|max:64',
-            'description' => 'nullable|string|max:128'
-        ]);
-
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        $grade->courses()->find($course->id)->update($validate->validated());
+        $course->update($request->validated_data);
 
         return response()->json(["message" => "The course $course->course has been successfully updated"], Response::HTTP_ACCEPTED);
     }
@@ -74,11 +62,11 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Grade $grade, Course $course)
+    public function destroy(Course $course)
     {
         //
-        $grade->courses()->find($course->id)->delete();
-
-        return response()->json(["message" => "The course $course->course has been successfully deleted from grade $grade->grade"], Response::HTTP_ACCEPTED);
+        // $grade->courses()->find($course->id)->delete();
+        $course->delete();
+        return response()->json(["message" => "The course $course->course has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
 }

@@ -16,13 +16,13 @@ class Course extends Model
     {
         return $this->hasMany(Qualification::class);
     }
-    public function grade()
+    public function gradeLevel()
     {
-        return $this->belongsTo(Grade::class);
+        return $this->belongsTo(GradeLevel::class);
     }
     public function schedules()
     {
-        return $this->hasMany(Schedule::class);
+        return $this->belongsToMany(Schedule::class)->withTimestamps()->withPivot('id', 'day');
     }
     public function teacher()
     {

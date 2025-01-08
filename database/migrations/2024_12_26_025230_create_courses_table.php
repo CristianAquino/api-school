@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('course', 64);
             $table->string('description', 128)->nullable();
             $table->foreignUuid('teacher_id')->nullable()->constrained('teachers')->onDelete('restrict');
-            $table->foreignId('grade_id')->constrained('grades')->onDelete('restrict');
+            $table->foreignId('grade_level_id')->nullable()->constrained('grade_level')->onDelete('restrict');
             $table->timestamps();
         });
     }
