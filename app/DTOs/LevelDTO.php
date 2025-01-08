@@ -15,9 +15,25 @@ class LevelDTO
         //
     }
 
-    public static function fromModel($model): self
+    public static function fromModel($model): array
     {
-        $grades = GradeDTO::fromNotRelationCollection($model->grades);
+        return [
+            'id' => $model->id,
+            'level' => $model->level,
+        ];
+    }
+
+    public static function fromCollection($collections): array
+    {
+        return array_map(function ($collection) {
+            return self::fromModel($collection);
+        }, $collections->all());
+    }
+
+
+    public static function fromModelWithRelation($model): self
+    {
+        $grades = GradeDTO::fromCollection($model->grades);
 
         return new self(
             $model->id,
@@ -26,18 +42,10 @@ class LevelDTO
         );
     }
 
-    public static function fromNotRelationModel($models): array
-    {
-        return [
-            'id' => $models->id,
-            'level' => $models->level,
-        ];
-    }
-
-    public static function fromNotRelationCollection($collections): array
-    {
-        return array_map(function ($collection) {
-            return self::fromNotRelationModel($collection);
-        }, $collections->all());
-    }
+    // public static function fromCollectionWithRelation($collections): array
+    // {
+    //     return array_map(function ($collection) {
+    //         return self::fromModelWithRelation($collection);
+    //     }, $collections->all());
+    // }
 }

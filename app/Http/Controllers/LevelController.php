@@ -16,7 +16,7 @@ class LevelController extends Controller
     {
         //
         $levels = Level::all();
-        $levelsDTO = LevelDTO::fromNotRelationCollection($levels);
+        $levelsDTO = LevelDTO::fromCollection($levels);
         return response()->json($levelsDTO, Response::HTTP_OK);
     }
 
@@ -36,7 +36,8 @@ class LevelController extends Controller
     public function show(Level $level)
     {
         //
-        return response()->json(LevelDTO::fromModel($level), Response::HTTP_OK);
+        $levelDTO = LevelDTO::fromModelWithRelation($level);
+        return response()->json($levelDTO, Response::HTTP_OK);
     }
 
     /**
