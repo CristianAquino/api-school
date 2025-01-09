@@ -20,8 +20,7 @@ Table enrollments{
 }
 Table grades {
   id integer [primary key]
-  name string
-  level_id integer
+  grade string
   created_at timestamp
 }
 Table levels {
@@ -40,6 +39,7 @@ Table students {
   address string
   email email
   dni string
+  role string
   created_at timestamp 
 }
 // total sera una variable env
@@ -60,18 +60,23 @@ Table qualifications {
 }
 Table courses {
   id integer [primary key]
-  name string
+  course string
   description string
   teacher_id uuid
   grade_level_id int
   created_at timestamp
 }
+Table courses_schedules{
+  id interger [primary key]
+  day string
+  course_id integer
+  schedule_id integer
+  created_at timestamp
+}
 Table schedules {
   id integer [primary key]
-  start_hour time
-  end_hour time
-  day varchar
-  course_id integer
+  start_time time
+  end_time time
   created_at timestamp
 }
 Table teachers {
@@ -85,6 +90,7 @@ Table teachers {
   address string
   email email
   dni string
+  role string
   created_at timestamp
 }
 Table grades_levels {
@@ -100,7 +106,8 @@ Ref: students.id <enrollments.student_id
 Ref: students.id < qualifications.student_id
 Ref: courses.id < qualifications.course_id
 Ref: teachers.id < courses.teacher_id
-Ref: courses.id < schedules.course_id
+Ref: courses.id < courses_schedules.course_id
+Ref: schedules.id < courses_schedules.schedule_id
 Ref: grades_levels.id < courses.grade_level_id 
 Ref: grades.id < grades_levels.grade_id
 Ref: levels.id < grades_levels.level_id
