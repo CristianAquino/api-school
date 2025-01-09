@@ -10,6 +10,8 @@ class Course extends Model
     protected $fillable = [
         'course',
         'description',
+        'grade_level_id',
+        'day'
     ];
     // relations
     public function qualifications()

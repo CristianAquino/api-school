@@ -13,19 +13,16 @@ class CourseDTO
         public readonly int $id,
         public readonly string $course,
         public readonly ?string $description = null,
-        public readonly string $grade,
         public readonly string $level,
+        public readonly string $grade,
         public readonly ?TeacherDTO $teacher,
-        public readonly ?array $schedules = []
+        public readonly ?ScheduleDTO $schedule
     ) {
         //
     }
 
     public static function fromModel($model): array
     {
-        // $gradeLevel = GradeLevel::find($model->grade_level_id);
-        // $grade = $gradeLevel->grade->grade;
-        // $level = $gradeLevel->level->level;
         return [
             'id' => $model->id,
             'course' => $model->course,
@@ -47,7 +44,11 @@ class CourseDTO
         } else {
             $teacher = null;
         }
-        $schedules = ScheduleDTO::fromCollection($model->schedules);
+        if (count($model->schedules) > 0) {
+            $schedule = ScheduleDTO::fromModelWithRelation($model->schedules[0]);
+        } else {
+            $schedule = null;
+        }
         $gradeLevel = GradeLevel::find($model->grade_level_id);
         $grade = $gradeLevel->grade->grade;
         $level = $gradeLevel->level->level;
@@ -55,26 +56,10 @@ class CourseDTO
             $model->id,
             $model->course,
             $model->description,
-            $grade,
             $level,
+            $grade,
             $teacher,
-            $schedules
+            $schedule
         );
-    }
-
-    public static function fromCollectionWithRelation($collections): array
-    {
-        return array_map(function ($collection) {
-            return self::fromModelWithRelation($collection);
-        }, $collections->all());
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'course' => $this->course,
-            'description' => $this->description,
-        ];
     }
 }

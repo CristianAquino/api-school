@@ -59,12 +59,10 @@ class GradeController extends Controller
     public function show(Level $level, Grade $grade)
     {
         //
-        // $gra = $grade->levels->find($level->id);
-        // $courses = Course::where('grade_level_id', $gra->pivot->id)->get();
-        $courses = GradeLevel::where('level_id', $level->id)->where('grade_id', $grade->id)->first()->course;
+        $courses = GradeLevel::where('level_id', $level->id)->where('grade_id', $grade->id)->first()->courses;
 
-        $relation = GradeDTO::fromModelWithRelation($grade, $level, $courses);
-        return response()->json($relation, Response::HTTP_OK);
+        $gradeDTO = GradeDTO::fromModelWithRelation($grade, $level, $courses);
+        return response()->json($gradeDTO, Response::HTTP_OK);
     }
 
     /**

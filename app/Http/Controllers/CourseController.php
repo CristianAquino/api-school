@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Grade;
 use App\Models\GradeLevel;
 use App\Models\Level;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -29,11 +30,18 @@ class CourseController extends Controller
     public function store(Request $request, Level $level, Grade $grade)
     {
         //
-        $relation = GradeLevel::where('grade_id', $grade->id)->where('level_id', $level->id)->first();
+        $gradeLevel = GradeLevel::where('grade_id', $grade->id)->where('level_id', $level->id)->first();
 
-        $course = new Course($request->validated_data);
-        $course->grade_level_id = $relation->id;
+        $course = new Course($request->only(["course", "description"]));
+        $course->grade_level_id = $gradeLevel->id;
         $course->save();
+
+        if ($request->schedule_id ?? null) {
+            $schedule = Schedule::where("id", $request->schedule_id)->first();
+            $course->schedules()->attach($schedule, [
+                "day" => $request->day,
+            ]);
+        }
 
         return response()->json(["message" => "The course $request->course has been successfully created"], Response::HTTP_CREATED);
     }
@@ -54,7 +62,19 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         //
-        $course->update($request->validated_data);
+        $course->update($request->only(['course', 'description', 'grade_level_id']));
+
+        if ($request->schedule_id ?? null) {
+            if ($request->day ?? null) {
+                $schedule = Schedule::where("id", $request->schedule_id)->first();
+                $course->schedules()->detach();
+                $course->schedules()->attach($schedule, [
+                    "day" => $request->day,
+                ]);
+            } else {
+                return response()->json(["message" => "The day not exist"], Response::HTTP_BAD_REQUEST);
+            }
+        }
 
         return response()->json(["message" => "The course $course->course has been successfully updated"], Response::HTTP_ACCEPTED);
     }

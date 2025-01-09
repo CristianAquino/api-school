@@ -11,7 +11,7 @@ class GradeDTO
         public readonly int $id,
         public readonly string $grade,
         public readonly string $level,
-        public readonly array $courses = [],
+        public readonly array $courses,
     ) {
         //
     }

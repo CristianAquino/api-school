@@ -30,7 +30,6 @@ class LevelDTO
         }, $collections->all());
     }
 
-
     public static function fromModelWithRelation($model): self
     {
         $grades = GradeDTO::fromCollection($model->grades);
@@ -41,11 +40,4 @@ class LevelDTO
             $grades
         );
     }
-
-    // public static function fromCollectionWithRelation($collections): array
-    // {
-    //     return array_map(function ($collection) {
-    //         return self::fromModelWithRelation($collection);
-    //     }, $collections->all());
-    // }
 }
