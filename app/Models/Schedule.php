@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     //
-    protected $fillable = ['day', 'start_time', 'end_time'];
+    protected $fillable = ['start_time', 'end_time'];
 
     public const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
     // relations
-    public function course()
+    public function courses()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsToMany(Course::class)->withTimestamps()->withPivot('id', 'day');
     }
 }

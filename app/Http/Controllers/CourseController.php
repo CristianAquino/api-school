@@ -67,9 +67,10 @@ class CourseController extends Controller
         if ($request->schedule_id ?? null) {
             if ($request->day ?? null) {
                 $schedule = Schedule::where("id", $request->schedule_id)->first();
+
                 $course->schedules()->detach();
                 $course->schedules()->attach($schedule, [
-                    "day" => $request->day,
+                    "day" => strtolower($request->day),
                 ]);
             } else {
                 return response()->json(["message" => "The day not exist"], Response::HTTP_BAD_REQUEST);

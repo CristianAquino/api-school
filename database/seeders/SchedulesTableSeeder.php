@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Course;
+use App\Models\CourseSchedule;
 use App\Models\Schedule;
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
+
 
 class SchedulesTableSeeder extends Seeder
 {
@@ -16,18 +16,37 @@ class SchedulesTableSeeder extends Seeder
     {
         //
         // vaciamos la tabla
+        CourseSchedule::truncate();
         Schedule::truncate();
-        $courses = Course::all();
-        $faker = Faker::create();
-        foreach ($courses as $course) {
-            $startTime = $faker->numberBetween(8, 12);
-            $start_time = sprintf('%02d:00:00', $startTime);
-            $end_time = sprintf('%02d:00:00', $startTime + 1);
+
+        $schedules = [
+            [
+                "start_time" => "08:00:00",
+                "end_time" => "09:00:00",
+            ],
+            [
+                "start_time" => "09:00:00",
+                "end_time" => "10:00:00",
+            ],
+            [
+                "start_time" => "10:00:00",
+                "end_time" => "11:00:00",
+            ],
+            [
+                "start_time" => "11:00:00",
+                "end_time" => "12:00:00",
+            ],
+            [
+                "start_time" => "12:00:00",
+                "end_time" => "13:00:00",
+            ],
+        ];
+
+        foreach ($schedules as $schedule) {
+            # code...
             Schedule::create([
-                'start_time' => $start_time,
-                'end_time' => $end_time,
-                'day' => $faker->randomElement(Schedule::DAYS),
-                'course_id' => $course->id
+                'start_time' => $schedule["start_time"],
+                'end_time' => $schedule["end_time"],
             ]);
         }
     }
