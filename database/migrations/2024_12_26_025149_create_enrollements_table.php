@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('restrict');
             $table->foreignUuid('student_id')->constrained('students')->onDelete('restrict');
-            $table->foreignId('grade_id')->constrained('grades')->onDelete('restrict');
+            $table->foreignId('grade_level_id')->constrained('grade_level')->onDelete('restrict');
             $table->timestamps();
         });
     }

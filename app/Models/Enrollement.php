@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Enrollement extends Model
 {
@@ -21,8 +20,8 @@ class Enrollement extends Model
     {
         return $this->belongsTo(Student::class);
     }
-    public function grade()
+    public function gradeLevel()
     {
-        return $this->belongsTo(Grade::class);
+        return $this->belongsTo(GradeLevel::class);
     }
 }
