@@ -15,7 +15,7 @@ class CourseDTO
         public readonly ?string $description = null,
         public readonly string $level,
         public readonly string $grade,
-        public readonly ?TeacherDTO $teacher,
+        public readonly TeacherDTO|array|null $teacher,
         public readonly ?ScheduleDTO $schedule
     ) {
         //
@@ -40,7 +40,7 @@ class CourseDTO
     public static function fromModelWithRelation($model): self
     {
         if ($model->teacher) {
-            $teacher = TeacherDTO::fromModel($model->teacher->user);
+            $teacher = TeacherDTO::fromModel($model->teacher);
         } else {
             $teacher = null;
         }
