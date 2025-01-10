@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\TeacherDTO;
 use App\Models\Course;
 use App\Models\Teacher;
 use App\Models\User;
@@ -21,8 +22,9 @@ class TeacherController extends Controller
     public function index()
     {
         //
-        $teachers = Teacher::with('user')->get();
-        return response()->json($teachers, Response::HTTP_OK);
+        $teachers = Teacher::all();
+        $teachersDTO = TeacherDTO::fromCollection($teachers);
+        return response()->json($teachersDTO, Response::HTTP_OK);
     }
 
     /**
@@ -31,30 +33,37 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         //
-        $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:64',
-            'first_name' => 'required|string|max:32',
-            'second_name' => 'required|string|max:32',
-            'phone' => 'required|string|max:32',
-            'birth_date' => 'nullable|date',
-            'address' => 'required|string|max:128',
-            'dni' => 'required|string|max:8|unique:users,dni',
-            'email' => 'required|email|unique:users,email',
-        ]);
+        // $validate = Validator::make($request->all(), [
+        //     'name' => 'required|string|max:64',
+        //     'first_name' => 'required|string|max:32',
+        //     'second_name' => 'required|string|max:32',
+        //     'phone' => 'required|string|max:32',
+        //     'birth_date' => 'nullable|date',
+        //     'address' => 'required|string|max:128',
+        //     'dni' => 'required|string|max:8|unique:users,dni',
+        //     'email' => 'required|email|unique:users,email',
+        // ]);
 
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
+        // if ($validate->fails()) {
+        //     return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        // }
 
         $i = Teacher::count();
-        $code = 'TE' . (int)date('Y') * 10000 + $i;
+
+        if ($i == 0) {
+            $code = 'TE' . (int)date('Y') * 10000 + $i;
+        } else {
+            $c = Teacher::latest("code_teacher")->first()->code_teacher;
+            $i = (int)substr($c, 2) + 1;
+            $code = 'TE' . $i;
+        }
 
         $teacher = Teacher::create([
             'code_teacher' => $code,
             'role' => User::ROLE_TEACHER
         ]);
 
-        $new_datos = $validate->validated();
+        $new_datos = $request->validated_data;
         $new_datos['password'] = $code . '1234';
 
         $teacher->user()->create($new_datos);
@@ -72,8 +81,8 @@ class TeacherController extends Controller
     public function show(Teacher $teacher)
     {
         //
-        $teacher->load('user');
-        return response()->json($teacher, Response::HTTP_OK);
+        $teacherDTO = TeacherDTO::fromModelWithRelation($teacher);
+        return response()->json($teacherDTO, Response::HTTP_OK);
     }
 
     public function assignCourse(Teacher $teacher, Course $course)
@@ -90,29 +99,13 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         //
-        $userId = $teacher->user ? $teacher->user->id : null;
-
-        $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:64',
-            'first_name' => 'required|string|max:32',
-            'second_name' => 'required|string|max:32',
-            'phone' => 'required|string|max:32',
-            'birth_date' => 'nullable|date',
-            'address' => 'required|string|max:128',
-            'dni' => 'required|string|max:8|unique:users,dni,' . $userId,
-            'email' => 'required|email|unique:users,email,' . $userId,
-        ]);
-
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
 
         if (is_null($teacher->user)) {
-            $new_datos = $validate->validated();
-            $new_datos['password'] = $validate->validated()['first_name'] . '1234';
+            $new_datos = $request->validated_data;
+            $new_datos['password'] = $request->validated_data['code_teacher'] . '1234';
             $teacher->user()->create($new_datos);
         } else {
-            $teacher->user()->update($validate->validated());
+            $teacher->user()->update($request->validated_data);
         }
 
         return response()->json(["message" => "The teacher with code $teacher->code_teacher has been successfully updated"], Response::HTTP_ACCEPTED);
