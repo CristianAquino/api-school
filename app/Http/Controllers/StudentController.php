@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\StudentDTO;
+use App\Models\AcademicYear;
+use App\Models\GradeLevel;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,8 +18,10 @@ class StudentController extends Controller
     public function index()
     {
         //
-        $students = Student::with('user')->get();
-        return response()->json($students, Response::HTTP_OK);
+        // pensar si poner level y grade
+        $students = Student::all();
+        $studentsDTO = StudentDTO::fromCollection($students);
+        return response()->json($studentsDTO, Response::HTTP_OK);
     }
 
     /**
@@ -33,8 +38,11 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         //
-        $student->load('user');
-        return response()->json($student, Response::HTTP_OK);
+        // $studentsDTO = $student->enrollements()->latest("academic_year_id")->first(); //->where("academic_year_id", $a->id)->first();
+        // $a = $studentsDTO->grade_level_id;
+        // $g = GradeLevel::find($a)->courses[0]->schedules;
+        $studentDTO = StudentDTO::fromModelWithRelation($student);
+        return response()->json($studentDTO, Response::HTTP_OK);
     }
 
     /**
@@ -43,22 +51,22 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         //
-        $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:64',
-            'first_name' => 'required|string|max:32',
-            'second_name' => 'required|string|max:32',
-            'phone' => 'required|string|max:32',
-            'birth_date' => 'nullable|date',
-            'address' => 'required|string|max:128',
-            'dni' => 'required|string|max:8|unique:users,dni,' . $student->user->id,
-            'email' => 'required|email|unique:users,email,' . $student->user->id,
-        ]);
+        // $validate = Validator::make($request->all(), [
+        //     'name' => 'required|string|max:64',
+        //     'first_name' => 'required|string|max:32',
+        //     'second_name' => 'required|string|max:32',
+        //     'phone' => 'required|string|max:32',
+        //     'birth_date' => 'nullable|date',
+        //     'address' => 'required|string|max:128',
+        //     'dni' => 'required|string|max:8|unique:users,dni,' . $student->user->id,
+        //     'email' => 'required|email|unique:users,email,' . $student->user->id,
+        // ]);
 
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
+        // if ($validate->fails()) {
+        //     return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        // }
 
-        $student->user()->update($validate->validated());
+        $student->user()->update($request->validated_data);
 
         return response()->json(["message" => "The student with code $student->code_student has been successfully updated"], Response::HTTP_ACCEPTED);
     }
