@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
@@ -27,9 +28,11 @@ class DatabaseSeeder extends Seeder
             GradesTableSeeder::class,
             CoursesTableSeeder::class,
             SchedulesTableSeeder::class,
+            CourseScheduleTableSeeder::class,
             TeachersTableSeeder::class,
             TeachersCoursesTableSeeder::class,
-            EnrollementsTableSeeder::class
+            EnrollementsTableSeeder::class,
+            QualificationsTableSeeder::class
         ]);
         Schema::enableForeignKeyConstraints();
     }
