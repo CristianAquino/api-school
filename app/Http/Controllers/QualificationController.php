@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Models\Qualification;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class QualificationController extends Controller
@@ -27,16 +26,23 @@ class QualificationController extends Controller
         //
         $prom = (int)config('app.avg_note');
 
-        $validate = Validator::make($request->all(), [
-            'number_note' => 'required|numeric|between:0,20',
-            'letter_note' => 'required|string|max:2',
-        ]);
+        $new_datos = $request->validated_data;
 
-        if ($validate->fails()) {
-            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        if (is_null($request->letter_note)) {
+            $correspondencias = [
+                'AD' => [18, 20],
+                'A' => [16, 17],
+                'B' => [10, 15],
+                'C' => [0, 9],
+            ];
+            foreach ($correspondencias as $letter => [$min, $max]) {
+                if ($new_datos['number_note'] >= $min && $new_datos['number_note'] <= $max) {
+                    $new_datos['letter_note'] = $letter;
+                    break;
+                }
+            }
         }
 
-        $new_datos = $validate->validated();
         $new_datos['letter_note'] = strtoupper($new_datos['letter_note']);
         $new_datos['avg'] = ($new_datos['number_note'] / $prom);
 

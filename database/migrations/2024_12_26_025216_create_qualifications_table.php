@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Qualification;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
         Schema::create('qualifications', function (Blueprint $table) {
             $table->id();
             $table->decimal('number_note',  4, 2);
-            $table->string('letter_note', 2);
+            $table->enum('letter_note', Qualification::LETTER_NOTES);
             $table->decimal('avg', 4, 2);
             $table->foreignUuid('student_id')->constrained('students')->onDelete('cascade');
             $table->foreignId('course_id')->constrained('courses')->onDelete('restrict');

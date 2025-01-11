@@ -14,6 +14,8 @@ class Qualification extends Model
         'avg',
     ];
 
+    public const LETTER_NOTES = ['AD', 'A', 'B', 'C',];
+
     // relations
     public function student()
     {
@@ -22,5 +24,15 @@ class Qualification extends Model
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+
+    // redondeo de avg a dos decimales
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->avg = round($model->avg, 2);
+        });
     }
 }
