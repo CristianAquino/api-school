@@ -64,7 +64,7 @@ class TeacherController extends Controller
         ]);
 
         $new_datos = $request->validated_data;
-        $new_datos['password'] = $code . '1234';
+        $new_datos['password'] = $code . $new_datos['dni'];
 
         $teacher->user()->create($new_datos);
 
@@ -99,7 +99,6 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         //
-
         if (is_null($teacher->user)) {
             $new_datos = $request->validated_data;
             $new_datos['password'] = $request->validated_data['code_teacher'] . '1234';

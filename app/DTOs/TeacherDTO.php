@@ -15,7 +15,7 @@ class TeacherDTO
         public readonly string $name,
         public readonly string $first_name,
         public readonly string $second_name,
-        public readonly string $phone,
+        public readonly ?string $phone,
         public readonly ?string $birth_date,
         public readonly string $address,
         public readonly string $email,
