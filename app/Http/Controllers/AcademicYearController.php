@@ -70,6 +70,10 @@ class AcademicYearController extends Controller
     public function destroy(AcademicYear $academicYear)
     {
         //
+        if ($academicYear->enrollements->count() > 0) {
+            return response()->json(["message" => "the academic year $academicYear->year cannot be deleted because it has enrollements"], Response::HTTP_BAD_REQUEST);
+        }
+
         $academicYear->delete();
         return response()->json(["message" => "the academic year $academicYear->year has been successfully deleted"], Response::HTTP_ACCEPTED);
     }

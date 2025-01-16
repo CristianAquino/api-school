@@ -21,8 +21,7 @@ class AcademicYearControllerTest extends TestCase
     public function test_can_list_academic_years(): void
     {
         // seeder
-        $this->seed(AcademicYearsTableSeeder::class);
-
+        // $this->seed(AcademicYearsTableSeeder::class);
         $response = $this->getJson('/api/academic_years');
 
         // test response
@@ -65,9 +64,6 @@ class AcademicYearControllerTest extends TestCase
 
     public function test_can_show_academic_year(): void
     {
-        // seeder
-        $this->seed(AcademicYearsTableSeeder::class);
-
         // random data
         $query = DB::table('academic_years')->inRandomOrder()->first();
         $response = $this->getJson("/api/academic_years/$query->id");
@@ -86,9 +82,6 @@ class AcademicYearControllerTest extends TestCase
 
     public function test_can_show_last_academic_year(): void
     {
-        // seeder
-        $this->seed(AcademicYearsTableSeeder::class);
-
         $latestYear = date("Y");
 
         $response = $this->getJson('/api/academic_years/last_year');
@@ -108,9 +101,6 @@ class AcademicYearControllerTest extends TestCase
 
     public function test_can_update_academic_year(): void
     {
-        // seeder
-        $this->seed(AcademicYearsTableSeeder::class);
-
         $faker = Faker::create();
         $year = $faker->year();
         $data = [
@@ -137,24 +127,21 @@ class AcademicYearControllerTest extends TestCase
         $this->assertDatabaseCount("academic_years", 1);
     }
 
-    public function test_can_delete_academic_year(): void
+    public function test_can_delete_academic_year_with_relations(): void
     {
-        // seeder
-        $this->seed(AcademicYearsTableSeeder::class);
-
         // radom data
         $query = DB::table('academic_years')->inRandomOrder()->first();
 
         $message = [
-            "message" => "the academic year $query->year has been successfully deleted"
+            "message" => "the academic year $query->year cannot be deleted because it has enrollements"
         ];
 
         $response = $this->deleteJson("/api/academic_years/$query->id");
 
         // test response
-        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
         $response->assertJson($message);
         // verifica si hay la misma cantidad de datos
-        $this->assertDatabaseCount("academic_years", 0);
+        $this->assertDatabaseCount("academic_years", 1);
     }
 }

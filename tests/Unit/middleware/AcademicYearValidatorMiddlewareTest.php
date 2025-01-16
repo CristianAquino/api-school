@@ -95,6 +95,33 @@ class AcademicYearValidatorMiddlewareTest extends TestCase
         $this->assertStringContainsString($message, $errors["end_date"][0]);
     }
 
+    public function test_invalid_year(): void
+    {
+        $faker = Faker::create();
+        $year = (string)$faker->randomNumber(5, true);
+        $data = [
+            'year' => $year,
+            'start_date' => $year . '/01/01',
+            'end_date' => $year . '/12/31',
+        ];
+
+        $request = Request::create(
+            '/api/academic_years',
+            'POST',
+            $data
+        );
+
+        $message =  "The year field must not be greater than 4 characters.";
+
+        $middleware = new AcademicYearValidatorMiddleware();
+        $response = $middleware->handle($request, function () {});
+        $errors = json_decode($response->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertArrayHasKey("year", $errors);
+        $this->assertStringContainsString($message, $errors["year"][0]);
+    }
+
     public function test_missing_required_fields(): void
     {
         $message = [
