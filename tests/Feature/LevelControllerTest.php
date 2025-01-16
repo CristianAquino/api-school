@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Database\Seeders\LevelsTableSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +18,6 @@ class LevelControllerTest extends TestCase
 
     public function test_can_list_levels(): void
     {
-        // seeder
-        $this->seed(LevelsTableSeeder::class);
-
         $response = $this->get('/api/levels');
 
         // test response
@@ -60,9 +56,6 @@ class LevelControllerTest extends TestCase
 
     public function test_can_show_level(): void
     {
-        // seeder
-        $this->seed(LevelsTableSeeder::class);
-
         $query = DB::table('levels')->inRandomOrder()->first();
         $response = $this->getJson("/api/levels/$query->id");
 
@@ -78,9 +71,6 @@ class LevelControllerTest extends TestCase
     }
     public function test_can_update_level(): void
     {
-        // seeder
-        $this->seed(LevelsTableSeeder::class);
-
         $faker = Faker::create();
         $level = $faker->word();
         $data = [
@@ -104,24 +94,21 @@ class LevelControllerTest extends TestCase
         $this->assertDatabaseHas('levels', $data);
     }
 
-    public function test_can_delete_level(): void
+    public function test_can_delete_level_with_relations(): void
     {
-        // seeder
-        $this->seed(LevelsTableSeeder::class);
-
         // radom data
         $query = DB::table('levels')->inRandomOrder()->first();
 
         $message = [
-            "message" => "The level $query->level has been successfully deleted"
+            "message" => "The level $query->level cannot be deleted because it has grades associated with it"
         ];
 
         $response = $this->deleteJson("/api/levels/$query->id");
 
         // test response
-        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
         $response->assertJson($message);
         // verifica si hay la misma cantidad de datos
-        $this->assertDatabaseCount("levels", 1);
+        $this->assertDatabaseCount("levels", 2);
     }
 }

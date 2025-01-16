@@ -59,6 +59,10 @@ class LevelController extends Controller
     public function destroy(Level $level)
     {
         //
+        if ($level->grades->count() > 0) {
+            return response()->json(["message" => "The level $level->level cannot be deleted because it has grades associated with it"], Response::HTTP_BAD_REQUEST);
+        }
+
         $level->delete();
         return response()->json(["message" => "The level $level->level has been successfully deleted"], Response::HTTP_ACCEPTED);
     }

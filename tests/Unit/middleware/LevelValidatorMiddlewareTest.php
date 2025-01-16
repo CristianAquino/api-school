@@ -39,12 +39,11 @@ class LevelValidatorMiddlewareTest extends TestCase
 
     public function test_repeat_level(): void
     {
+        // DB::insert('insert into levels (level) values (?)', ["Primary"]);
         $data = [
-            'level' => 'primary',
+            'level' => 'Primary',
         ];
-        $message = "The level " . strtolower($data["level"]) . " already exists.";
-
-        DB::insert('insert into levels (level) values (?)', ["Primary"]);
+        $message = "The level " . $data["level"] . " already exists.";
 
         $request = Request::create(
             '/api/levels',
