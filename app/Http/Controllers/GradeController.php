@@ -35,8 +35,7 @@ class GradeController extends Controller
         if ($exists) {
             $g = $query->first();
             if ($g->levels->find($level) && $g->levels->find($level)->level == $level->level) {
-
-                return response()->json(["message" => "Grade $g->grade for level $level->level already exists, please enter another grade or modify the existing grade"], Response::HTTP_CREATED);
+                return response()->json(["message" => "Grade $g->grade for level $level->level already exists, please enter another grade or modify the existing grade"], Response::HTTP_BAD_REQUEST);
             }
 
             $level->grades()->attach($g);
@@ -50,7 +49,7 @@ class GradeController extends Controller
 
         $level->grades()->attach($g);
 
-        return response()->json(["message" => "The grade $request->grade has been successfully created"], Response::HTTP_CREATED);
+        return response()->json(["message" => "Grade $request->grade has been successfully created"], Response::HTTP_CREATED);
     }
 
     /**
@@ -91,6 +90,9 @@ class GradeController extends Controller
     public function destroy(Grade $grade)
     {
         //
+        if ($grade->levels->count() > 0) {
+            return response()->json(["message" => "The grade $grade->grade cannot be deleted because it is assigned to one or more levels"], Response::HTTP_BAD_REQUEST);
+        }
         $grade->delete();
         return response()->json(["message" => "The grade $grade->grade has been successfully deleted"], Response::HTTP_ACCEPTED);
     }
