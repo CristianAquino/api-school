@@ -37,7 +37,7 @@ class TeachersTableSeeder extends Seeder
                 'birth_date' => $faker->date('Y-m-d', '1990-12-31'),
                 'address' => $faker->address,
                 'phone' => $faker->phoneNumber,
-                'dni' => (string)$faker->randomNumber(8),
+                'dni' => (string)$faker->randomNumber(8, true),
                 'email' => $faker->email,
                 'password' => $password,
             ]);

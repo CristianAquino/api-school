@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Schedule;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -35,7 +34,6 @@ class ScheduleValidatorMiddleware
         if ($validate->fails()) {
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
 
         $request->merge(["validated_data" => $validate->validated()]);
 

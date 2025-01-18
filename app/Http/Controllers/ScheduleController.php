@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\ScheduleDTO;
-use App\Models\Course;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class ScheduleController extends Controller

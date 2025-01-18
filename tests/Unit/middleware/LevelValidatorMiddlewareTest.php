@@ -83,4 +83,26 @@ class LevelValidatorMiddlewareTest extends TestCase
         $this->assertArrayHasKey("level", $errors);
         $this->assertStringContainsString($message, $errors["level"][0]);
     }
+
+    public function test_successful_validation(): void
+    {
+        $faker = Faker::create();
+        $data = [
+            'level' => $faker->word(),
+        ];
+
+        $request = Request::create(
+            '/api/academic_years',
+            'POST',
+            $data
+        );
+
+        $middleware = new LevelValidatorMiddleware();
+        $response = $middleware->handle($request, function () {
+            // Return value must be of type Symfony\Component\HttpFoundation\Response
+            return response()->json(['success' => true]);
+        });
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
 }

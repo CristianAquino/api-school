@@ -130,4 +130,26 @@ class CourseValidatorMiddlewareTest extends TestCase
         $this->assertArrayHasKey("grade_level_id", $errors);
         $this->assertStringContainsString($message, $errors["grade_level_id"][0]);
     }
+
+    public function test_successful_validation(): void
+    {
+        $faker = Faker::create();
+        $data = [
+            "course" => $faker->word(),
+        ];
+
+        $request = Request::create(
+            '/api/academic_years',
+            'POST',
+            $data
+        );
+
+        $middleware = new CourseValidatorMiddleware();
+        $response = $middleware->handle($request, function () {
+            // Return value must be of type Symfony\Component\HttpFoundation\Response
+            return response()->json(['success' => true]);
+        });
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
 }

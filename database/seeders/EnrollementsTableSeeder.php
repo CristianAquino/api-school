@@ -43,7 +43,7 @@ class EnrollementsTableSeeder extends Seeder
                         'second_name' => $faker->lastName,
                         'birth_date' => $faker->date(),
                         'address' => $faker->address,
-                        'dni' => (string)$faker->randomNumber(8),
+                        'dni' => (string)$faker->randomNumber(8, true),
                         'email' => $faker->email,
                         'password' => $password,
                     ]);

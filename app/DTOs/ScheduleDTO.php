@@ -49,7 +49,7 @@ class ScheduleDTO
         $courses =  array_map(function ($collection) {
             $course = CourseDTO::fromModel($collection);
             if ($collection->teacher) {
-                $teacher = TeacherDTO::fromModel($collection->teacher->user);
+                $teacher = TeacherDTO::fromModel($collection->teacher);
             } else {
                 $teacher = null;
             }

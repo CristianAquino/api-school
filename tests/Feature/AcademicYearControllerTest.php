@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Database\Seeders\AcademicYearsTableSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
