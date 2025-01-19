@@ -91,6 +91,7 @@ class GradeControllerTest extends TestCase
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
+        $this->assertDatabaseHas('grades', $data);
     }
 
     public function test_can_show_grade(): void

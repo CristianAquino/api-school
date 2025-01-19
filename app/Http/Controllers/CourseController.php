@@ -36,7 +36,7 @@ class CourseController extends Controller
         $course->grade_level_id = $gradeLevel->id;
         $course->save();
 
-        if ($request->schedule_id ?? null) {
+        if (!is_null($request->schedule_id)) {
             $schedule = Schedule::where("id", $request->schedule_id)->first();
             $course->schedules()->attach($schedule, [
                 "day" => $request->day,

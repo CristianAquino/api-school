@@ -62,7 +62,7 @@ class CourseControllerTest extends TestCase
         $this->assertDatabaseHas('courses', $data);
     }
 
-    public function test_can_create_with_schedule(): void
+    public function test_can_create_course_with_schedule(): void
     {
         $faker = Faker::create();
         $course = $faker->word();
@@ -89,6 +89,9 @@ class CourseControllerTest extends TestCase
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
+        $this->assertDatabaseHas('courses', [
+            'course' => $data["course"],
+        ]);
     }
 
     public function test_can_show_course(): void

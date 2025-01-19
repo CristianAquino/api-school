@@ -10,7 +10,7 @@ use Tests\TestCase;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
 
-class TeacherValidatorMiddlewareTest extends TestCase
+class UserValidatorMiddlewareTest extends TestCase
 {
     /**
      * A basic unit test example.
@@ -145,7 +145,7 @@ class TeacherValidatorMiddlewareTest extends TestCase
         ];
 
         $request = Request::create(
-            '/api/academic_years',
+            '/api/teachers',
             'POST',
             $data
         );

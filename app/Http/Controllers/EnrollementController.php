@@ -9,7 +9,6 @@ use App\Models\GradeLevel;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnrollementController extends Controller
