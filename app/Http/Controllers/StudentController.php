@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\StudentDTO;
-use App\Models\AcademicYear;
-use App\Models\GradeLevel;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class StudentController extends Controller
