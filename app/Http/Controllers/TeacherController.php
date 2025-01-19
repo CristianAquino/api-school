@@ -7,12 +7,8 @@ use App\Models\Course;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
-use function PHPUnit\Framework\isNull;
 
 class TeacherController extends Controller
 {
@@ -72,7 +68,7 @@ class TeacherController extends Controller
             $teacher->delete();
         }
 
-        return response()->json(["message" => "teacher $request->fisrt_name $request->second_name $request->name has been added successfully with code $teacher->code_teacher"], Response::HTTP_CREATED);
+        return response()->json(["message" => "teacher $request->first_name $request->second_name $request->name has been added successfully with code $teacher->code_teacher"], Response::HTTP_CREATED);
     }
 
     /**
@@ -90,7 +86,7 @@ class TeacherController extends Controller
         $course->teacher_id = $teacher->id;
         $course->save();
 
-        return response()->json(["message" => "Professor" . $teacher->user->first_name . $teacher->user->second_name . "has been successfully assigned course $course->course"], Response::HTTP_OK);
+        return response()->json(["message" => "Professor " . $teacher->user->first_name . " " . $teacher->user->second_name . " has been successfully assigned course $course->course"], Response::HTTP_OK);
     }
 
     /**

@@ -27,7 +27,6 @@ class TeacherValidatorMiddleware
             'email' => 'required|email|unique:users,email',
         ];
 
-
         if ($request->isMethod('put') || $request->isMethod('patch')) {
             $teacher = $request->route('teacher');
             $userId = $teacher->user ? $teacher->user->id : null;
