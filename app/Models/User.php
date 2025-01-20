@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -91,6 +92,16 @@ class User extends Authenticatable
         return self::isRoleHierarchy($role, self::ROLES_HIERARCHY[$this->role]);
     }
 
+    // implementacion de metodos para JWTAuth
+    public function getJWTIdentifier()
+    {
+        return $this->getKey(); // ID del usuario
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     public function userable(): MorphTo
     {
