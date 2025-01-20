@@ -20,7 +20,7 @@ class TeachersTableSeeder extends Seeder
         Teacher::truncate();
         $faker = Faker::create();
 
-        $password = Hash::make('12345678');
+        // $password = Hash::make('12345678');
 
         // create teacher
         for ($i = 0; $i < 15; $i++) {
@@ -39,7 +39,7 @@ class TeachersTableSeeder extends Seeder
                 'phone' => $faker->phoneNumber,
                 'dni' => (string)$faker->randomNumber(8, true),
                 'email' => $faker->email,
-                'password' => $password,
+                'password' => '12345678',
             ]);
         }
     }

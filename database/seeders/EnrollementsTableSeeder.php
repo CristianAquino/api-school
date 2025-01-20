@@ -26,7 +26,6 @@ class EnrollementsTableSeeder extends Seeder
         $academic_year = AcademicYear::latest()->first();
         $levels = Level::all();
 
-        $password = Hash::make('12345678');
         $s = 0;
         foreach ($levels as $level) {
             foreach ($level->grades as $grade) {
@@ -45,7 +44,7 @@ class EnrollementsTableSeeder extends Seeder
                         'address' => $faker->address,
                         'dni' => (string)$faker->randomNumber(8, true),
                         'email' => $faker->email,
-                        'password' => $password,
+                        'password' => '12345678',
                     ]);
                     Enrollement::create([
                         'academic_year_id' => $academic_year->id,

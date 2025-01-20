@@ -17,8 +17,6 @@ class AdminsTableSeeder extends Seeder
         // vaciamos la tabla
         Admin::truncate();
 
-        $password = Hash::make('12345678');
-
         // create admin
         $admin = Admin::create([
             'code_admin' => 'AD' . (int) date("Y") * 10000,
@@ -28,7 +26,7 @@ class AdminsTableSeeder extends Seeder
         $admin->user()->create([
             'name' => 'administrator',
             'email' => 'admin@admin.com',
-            'password' => $password,
+            'password' => '12345678',
         ]);
     }
 }
