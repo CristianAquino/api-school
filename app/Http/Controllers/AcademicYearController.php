@@ -24,10 +24,10 @@ class AcademicYearController extends Controller
     /**
      * Display a listing of the resource remove soft.
      */
-    public function soft_list()
+    public function softList()
     {
         //
-        $response = Gate::inspect('soft_view', AcademicYear::class);
+        $response = Gate::inspect('softList', AcademicYear::class);
 
         if (!$response->allowed()) {
             return response()->json([
@@ -46,7 +46,7 @@ class AcademicYearController extends Controller
     public function store(Request $request)
     {
         //
-        $response = Gate::inspect('create', AcademicYear::class);
+        $response = Gate::inspect('store', AcademicYear::class);
 
         if (!$response->allowed()) {
             return response()->json([
@@ -112,10 +112,10 @@ class AcademicYearController extends Controller
     /**
      * Remove soft the specified resource from storage.
      */
-    public function soft_destroy(AcademicYear $academicYear)
+    public function softDestroy(AcademicYear $academicYear)
     {
         //
-        $response = Gate::inspect('soft_delete', AcademicYear::class);
+        $response = Gate::inspect('softDestroy', AcademicYear::class);
 
         if (!$response->allowed()) {
             return response()->json([
@@ -163,7 +163,7 @@ class AcademicYearController extends Controller
     public function destroy($id)
     {
         //
-        $response = Gate::inspect('forceDelete', AcademicYear::class);
+        $response = Gate::inspect('destroy', AcademicYear::class);
 
         if (!$response->allowed()) {
             return response()->json([
