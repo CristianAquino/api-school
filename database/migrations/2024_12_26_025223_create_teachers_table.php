@@ -14,7 +14,6 @@ return new class extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('code_teacher')->unique();
             $table->string('role')->default(User::ROLE_TEACHER);
             $table->timestamps();
         });

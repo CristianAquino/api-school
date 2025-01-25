@@ -15,8 +15,12 @@ return new class extends Migration
         Schema::create('course_schedule', function (Blueprint $table) {
             $table->id();
             $table->enum('day', Schedule::DAYS);
-            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
-            $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
+            $table->foreignId('course_id')
+                ->constrained('courses')
+                ->cascadeOnDelete();
+            $table->foreignId('schedule_id')
+                ->constrained('schedules')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

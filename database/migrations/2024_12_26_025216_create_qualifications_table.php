@@ -17,8 +17,12 @@ return new class extends Migration
             $table->decimal('number_note',  4, 2);
             $table->enum('letter_note', Qualification::LETTER_NOTES);
             $table->decimal('avg', 4, 2);
-            $table->foreignUuid('student_id')->constrained('students')->onDelete('cascade');
-            $table->foreignId('course_id')->constrained('courses')->onDelete('restrict');
+            $table->foreignUuid('student_id')
+                ->constrained('students')
+                ->cascadeOnDelete();
+            $table->foreignId('course_id')
+                ->constrained('courses')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

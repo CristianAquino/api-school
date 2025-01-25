@@ -14,7 +14,6 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('code_student')->unique();
             $table->string('role')->default(User::ROLE_STUDENT);
             $table->timestamps();
         });

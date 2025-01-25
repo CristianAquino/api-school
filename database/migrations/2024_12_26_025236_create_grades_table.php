@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->string('grade', 8)->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

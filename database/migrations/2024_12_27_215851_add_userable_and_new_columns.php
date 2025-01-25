@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->string('address', 128)->nullable();
             $table->string('dni', 8)->nullable();
+            $table->string('code')->unique();
             $table->string('userable_id')->nullable();
             $table->string('userable_type')->nullable();
         });

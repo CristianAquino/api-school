@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('enrollements', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('restrict');
-            $table->foreignUuid('student_id')->constrained('students')->onDelete('restrict');
-            $table->foreignId('grade_level_id')->constrained('grade_level')->onDelete('restrict');
+            $table->foreignId('academic_year_id')
+                ->constrained('academic_years')
+                ->cascadeOnDelete();
+            $table->foreignUuid('student_id')
+                ->constrained('students')
+                ->cascadeOnDelete();
+            $table->foreignId('grade_level_id')
+                ->constrained('grade_level')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }
