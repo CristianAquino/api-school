@@ -37,7 +37,8 @@ class TeacherControllerTest extends TestCase
 
     public function test_can_create_teacher(): void
     {
-        $c = DB::table('teachers')->latest("code_teacher")->first()->code_teacher;
+        $teacher = DB::table('teachers')->latest("id")->first();
+        $c = DB::table('users')->where('userable_id', $teacher->id)->first()->code;
         $i = (int)substr($c, 2) + 1;
         $code = 'TE' . $i;
 
@@ -51,7 +52,6 @@ class TeacherControllerTest extends TestCase
             'phone' => $faker->phoneNumber,
             'dni' => (string)$faker->randomNumber(8, true),
             'email' => $faker->email(),
-            'password' => $faker->paragraph(1),
         ];
         $message = [
             "message" => "teacher " . $data["first_name"] . " " . $data["second_name"] . " " . $data["name"] . " has been added successfully with code $code"
@@ -123,9 +123,10 @@ class TeacherControllerTest extends TestCase
 
         // radom data
         $teacher = DB::table('teachers')->inRandomOrder()->first();
+        $code = DB::table('users')->where('userable_id', $teacher->id)->first()->code;
 
         $message = [
-            "message" => "The teacher with code $teacher->code_teacher has been successfully updated"
+            "message" => "The teacher with code $code has been successfully updated"
         ];
 
         $response = $this->putJson("/api/teachers/$teacher->id", $data);
@@ -135,11 +136,11 @@ class TeacherControllerTest extends TestCase
         // verifica si el dato existe en la base de datos
         $this->assertDatabaseHas('teachers', [
             'id' => $teacher->id,
-            'code_teacher' => $teacher->code_teacher
         ]);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('users', [
             'email' => $data["email"],
+            'code' => $code,
             'userable_id' => $teacher->id,
         ]);
     }

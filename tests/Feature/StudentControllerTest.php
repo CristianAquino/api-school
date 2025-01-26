@@ -74,8 +74,9 @@ class StudentControllerTest extends TestCase
 
         // radom data
         $student = DB::table('students')->inRandomOrder()->first();
+        $code = DB::table('users')->where('userable_id', $student->id)->first()->code;
 
-        $message = ["message" => "The student with code $student->code_student has been successfully updated"];
+        $message = ["message" => "The student with code $code has been successfully updated"];
 
         $response = $this->putJson("/api/students/$student->id", $data);
 
@@ -84,10 +85,11 @@ class StudentControllerTest extends TestCase
         $response->assertJson($message);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('students', [
-            "code_student" => $student->code_student
+            'id' => $student->id,
         ]);
         $this->assertDatabaseHas('users', [
-            "email" => $data["email"]
+            "email" => $data["email"],
+            "code" => $code
         ]);
     }
 }
