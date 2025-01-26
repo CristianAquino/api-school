@@ -7,6 +7,7 @@ use App\Models\Grade;
 use App\Models\GradeLevel;
 use App\Models\Level;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class GradeController extends Controller
@@ -23,11 +24,38 @@ class GradeController extends Controller
     }
 
     /**
+     * Display a listing of the resource remove soft.
+     */
+    public function softList()
+    {
+        //
+        $response = Gate::inspect('softList', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $deletedGrades = Grade::onlyTrashed()->get();
+        $deleteGradesDTO = GradeDTO::fromCollection($deletedGrades);
+        return response()->json($deleteGradesDTO, Response::HTTP_OK);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request, Level $level)
     {
         //
+        $response = Gate::inspect('store', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $query = Grade::whereRaw('Lower(grade) = ?', strtolower($request->validated_data["grade"]));
 
         $exists = $query->exists();
@@ -35,12 +63,15 @@ class GradeController extends Controller
         if ($exists) {
             $g = $query->first();
             if ($g->levels->find($level) && $g->levels->find($level)->level == $level->level) {
-                return response()->json(["message" => "Grade $g->grade for level $level->level already exists, please enter another grade or modify the existing grade"], Response::HTTP_BAD_REQUEST);
+                return response()->json([
+                    "message" => "Grade $g->grade for level $level->level already exists, please enter another grade or modify the existing grade"
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $level->grades()->attach($g);
-
-            return response()->json(["message" => "Grade $request->grade has been correctly assigned to level $level->level"], Response::HTTP_CREATED);
+            return response()->json([
+                "message" => "Grade $request->grade has been correctly assigned to level $level->level"
+            ], Response::HTTP_CREATED);
         }
 
         $g = Grade::create([
@@ -48,8 +79,9 @@ class GradeController extends Controller
         ]);
 
         $level->grades()->attach($g);
-
-        return response()->json(["message" => "Grade $request->grade has been successfully created"], Response::HTTP_CREATED);
+        return response()->json([
+            "message" => "Grade $request->grade has been successfully created"
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -70,30 +102,115 @@ class GradeController extends Controller
     public function update(Request $request, Grade $grade)
     {
         //
-        $g = $grade->grade;
-        $grade->update($request->validated_data);
+        $response = Gate::inspect('update', Grade::class);
 
-        return response()->json(["message" => "The grade $g has been successfully updated to $request->grade"], Response::HTTP_ACCEPTED);
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $g = $grade->grade;
+
+        $grade->update($request->validated_data);
+        return response()->json([
+            "message" => "The grade $g has been successfully updated to $request->grade"
+        ], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * Unlinks a specific resource with another.
+     */
+    public function detach(Level $level, Grade $grade)
+    {
+        //
+        $response = Gate::inspect('detach', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $level->grades()->detach($grade->id);
+        return response()->json([
+            "message" => "The grade $grade->grade has been successfully deleted from level $level->level"
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function detach(Level $level, Grade $grade)
+    public function softDestroy(Grade $grade)
     {
         //
-        $level->grades()->detach($grade->id);
+        $response = Gate::inspect('softDestroy', Grade::class);
 
-        return response()->json(["message" => "The grade $grade->grade has been successfully deleted from level $level->level"], Response::HTTP_ACCEPTED);
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $grade->delete();
+        return response()->json([
+            "message" => "The grade $grade->grade has been successfully deleted"
+        ], Response::HTTP_ACCEPTED);
     }
 
-    public function destroy(Grade $grade)
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore($id)
     {
         //
-        if ($grade->levels->count() > 0) {
-            return response()->json(["message" => "The grade $grade->grade cannot be deleted because it is assigned to one or more levels"], Response::HTTP_BAD_REQUEST);
+        $response = Gate::inspect('restore', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
         }
-        $grade->delete();
-        return response()->json(["message" => "The grade $grade->grade has been successfully deleted"], Response::HTTP_ACCEPTED);
+
+        $grade = Grade::onlyTrashed()->find($id);
+
+        if (is_null($grade)) {
+            return response()->json([
+                "message" => "the grade does not exist"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $grade->restore();
+        return response()->json([
+            "message" => "the grade $grade->grade has been successfully restored"
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Remove permanently the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        //
+        $response = Gate::inspect('destroy', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $grade = Grade::onlyTrashed()->find($id);
+
+        if (is_null($grade)) {
+            return response()->json([
+                "message" => "the grade does not exist"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $grade->forceDelete();
+        return response()->json([
+            "message" => "the level $grade->grade has been successfully deleted permanently"
+        ], Response::HTTP_ACCEPTED);
     }
 }
