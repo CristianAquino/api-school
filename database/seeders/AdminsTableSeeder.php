@@ -19,7 +19,6 @@ class AdminsTableSeeder extends Seeder
 
         // create admin
         $admin = Admin::create([
-            'code_admin' => 'AD' . (int) date("Y") * 10000,
             'role' => 'ROLE_SUPERADMIN'
         ]);
 
@@ -27,6 +26,7 @@ class AdminsTableSeeder extends Seeder
             'name' => 'administrator',
             'email' => 'admin@admin.com',
             'password' => '12345678',
+            'code' => 'AD' . (int) date("Y") * 10000,
         ]);
     }
 }

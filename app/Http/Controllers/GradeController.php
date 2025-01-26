@@ -210,7 +210,7 @@ class GradeController extends Controller
 
         $grade->forceDelete();
         return response()->json([
-            "message" => "the level $grade->grade has been successfully deleted permanently"
+            "message" => "the grade $grade->grade has been successfully deleted permanently"
         ], Response::HTTP_ACCEPTED);
     }
 }

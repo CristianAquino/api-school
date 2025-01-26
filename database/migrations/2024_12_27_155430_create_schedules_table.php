@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->time('start_time')->default('08:00:00');
             $table->time('end_time')->default('09:00:00');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

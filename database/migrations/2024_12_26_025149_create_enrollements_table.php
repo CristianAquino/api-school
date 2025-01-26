@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('grade_level_id')
                 ->constrained('grade_level')
                 ->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

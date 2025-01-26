@@ -23,6 +23,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('grade_level')
                 ->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
