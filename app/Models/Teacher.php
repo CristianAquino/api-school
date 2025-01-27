@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Teacher extends Model
@@ -12,9 +13,9 @@ class Teacher extends Model
     //
     // uuid
     use HasUuids;
+    use SoftDeletes;
 
     protected $fillable = [
-        'code_teacher',
         'role'
     ];
 

@@ -71,7 +71,7 @@ class TeacherDTO
             $user->address,
             $user->email,
             $user->dni,
-            $model->code_teacher,
+            $user->code,
             $courses
         );
     }

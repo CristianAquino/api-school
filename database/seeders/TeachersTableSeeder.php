@@ -25,9 +25,10 @@ class TeachersTableSeeder extends Seeder
         // create teacher
         for ($i = 0; $i < 15; $i++) {
             # code...
-            $code = (int) date("Y") * 10000 + $i;
+            $od = (int) date("Y") * 10000 + $i;
+            $code = 'TE' . $od;
+            $dni = (string)$faker->randomNumber(8, true);
             $teacher = Teacher::create([
-                'code_teacher' => 'TE' . $code,
                 'role' => 'ROLE_TEACHER'
             ]);
             $teacher->user()->create([
@@ -37,9 +38,10 @@ class TeachersTableSeeder extends Seeder
                 'birth_date' => $faker->date('Y-m-d', '1990-12-31'),
                 'address' => $faker->address,
                 'phone' => $faker->phoneNumber,
-                'dni' => (string)$faker->randomNumber(8, true),
+                'dni' => $dni,
                 'email' => $faker->email,
-                'password' => '12345678',
+                'password' => $code . $dni,
+                'code' => $code,
             ]);
         }
     }
