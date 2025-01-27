@@ -58,7 +58,7 @@ class StudentDTO
             'academic_year' => $lastEnrollement->academic_year->year,
             'level' => $level,
             'grade' => $grade,
-            'code_student' => $model->code_student,
+            'code_student' => $user->code,
             'course' => $courses
 
         ];
