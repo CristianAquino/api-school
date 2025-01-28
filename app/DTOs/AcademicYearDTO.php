@@ -16,7 +16,7 @@ class AcademicYearDTO
         //
     }
 
-    public static function fromModel($model): self
+    public static function fromBase($model): self
     {
         return new self(
             $model->id,
@@ -26,12 +26,27 @@ class AcademicYearDTO
         );
     }
 
-    public static function fromCollection($collections): array
+    public static function fromPagination($model): array
+    {
+        return [
+            'data' => self::fromPaginationCollection($model->items()),
+            'pagination' => PaginationDTO::base($model)
+        ];
+    }
+
+    public static function fromPaginationCollection($collections): array
     {
         return array_map(function ($collection) {
-            return self::fromModel($collection);
-        }, $collections->all());
+            return self::fromBase($collection);
+        }, $collections);
     }
+
+    // public static function fromCollection($collections): array
+    // {
+    //     return array_map(function ($collection) {
+    //         return self::base($collection);
+    //     }, $collections->all());
+    // }
 
     public function toArray(): array
     {

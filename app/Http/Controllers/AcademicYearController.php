@@ -13,18 +13,24 @@ class AcademicYearController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $academicYears = AcademicYear::all();
-        $academicYearsDTO = AcademicYearDTO::fromCollection($academicYears);
+        $year = $request->query('year');
+        $academicYears = AcademicYear::query()
+            ->when(
+                $year,
+                fn($query, $year) => $query->where('year', 'like',  "%$year%")
+            )
+            ->paginate(10);
+        $academicYearsDTO = AcademicYearDTO::fromPagination($academicYears);
         return response()->json($academicYearsDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', AcademicYear::class);
@@ -35,8 +41,16 @@ class AcademicYearController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedAcademicYears = AcademicYear::onlyTrashed()->get();
-        $deletedAcademicYearsDTO = AcademicYearDTO::fromCollection($deletedAcademicYears);
+        $year = $request->query('year');
+
+        $deletedAcademicYears = AcademicYear::onlyTrashed()
+            ->when(
+                $year,
+                fn($query, $year) => $query->where('year', 'like',  "%$year%")
+            )
+            ->paginate(10);;
+
+        $deletedAcademicYearsDTO = AcademicYearDTO::fromPagination($deletedAcademicYears);
         return response()->json($deletedAcademicYearsDTO, Response::HTTP_OK);
     }
 
@@ -66,7 +80,15 @@ class AcademicYearController extends Controller
     public function show(AcademicYear $academicYear)
     {
         //
-        $academicYearDTO = AcademicYearDTO::fromModel($academicYear);
+        $response = Gate::inspect('view', AcademicYear::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $academicYearDTO = AcademicYearDTO::fromBase($academicYear);
         return response()->json($academicYearDTO, Response::HTTP_OK);
     }
 
@@ -75,8 +97,17 @@ class AcademicYearController extends Controller
      */
     public function lastYear()
     {
+        // 
+        $response = Gate::inspect('view', AcademicYear::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $lastYear = AcademicYear::latest('year')->first();
-        $lastYearDTO = AcademicYearDTO::fromModel($lastYear);
+        $lastYearDTO = AcademicYearDTO::fromBase($lastYear);
         return response()->json($lastYearDTO, Response::HTTP_OK);
     }
 
