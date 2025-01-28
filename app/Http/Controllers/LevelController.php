@@ -13,18 +13,25 @@ class LevelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $levels = Level::all();
-        $levelsDTO = LevelDTO::fromCollection($levels);
+        $level = strtolower($request->query('level'));
+        $levels = Level::query()
+            ->when(
+                $level,
+                fn($query, $level) => $query->whereRaw('Lower(level) like ?',  "%$level%")
+            )
+            ->paginate(10);
+
+        $levelsDTO = LevelDTO::fromPagination($levels);
         return response()->json($levelsDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', Level::class);
@@ -35,8 +42,16 @@ class LevelController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedLevel = Level::onlyTrashed()->get();
-        $deleteLevelsDTO = LevelDTO::fromCollection($deletedLevel);
+        $level = strtolower($request->query('level'));
+
+        $deletedLevel = Level::onlyTrashed()
+            ->when(
+                $level,
+                fn($query, $level) => $query->whereRaw('Lower(level) like ?',  "%$level%")
+            )
+            ->paginate(10);
+
+        $deleteLevelsDTO = LevelDTO::fromPagination($deletedLevel);
         return response()->json($deleteLevelsDTO, Response::HTTP_OK);
     }
 
@@ -66,6 +81,14 @@ class LevelController extends Controller
     public function show(Level $level)
     {
         //
+        $response = Gate::inspect('view', Level::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $levelDTO = LevelDTO::fromModelWithRelation($level);
         return response()->json($levelDTO, Response::HTTP_OK);
     }
@@ -87,7 +110,6 @@ class LevelController extends Controller
         $lev = $level->level;
 
         $level->update($request->validated_data);
-
         return response()->json([
             "message" => "The level $lev has been successfully updated to $request->level"
         ], Response::HTTP_ACCEPTED);

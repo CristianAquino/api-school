@@ -15,6 +15,23 @@ class LevelDTO
         //
     }
 
+    public static function fromBase($model, $grades): self
+    {
+        return new self(
+            $model->id,
+            $model->level,
+            $grades
+        );
+    }
+
+    public static function fromPagination($model): array
+    {
+        return [
+            'data' => self::fromPaginationCollection($model->items()),
+            'pagination' => PaginationDTO::base($model)
+        ];
+    }
+
     public static function fromModel($model): array
     {
         return [
@@ -23,21 +40,16 @@ class LevelDTO
         ];
     }
 
-    public static function fromCollection($collections): array
+    public static function fromPaginationCollection($collections): array
     {
         return array_map(function ($collection) {
             return self::fromModel($collection);
-        }, $collections->all());
+        }, $collections);
     }
 
     public static function fromModelWithRelation($model): self
     {
         $grades = GradeDTO::fromCollection($model->grades);
-
-        return new self(
-            $model->id,
-            $model->level,
-            $grades
-        );
+        return self::fromBase($model, $grades);
     }
 }

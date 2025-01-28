@@ -23,6 +23,7 @@ class AcademicYearController extends Controller
                 fn($query, $year) => $query->where('year', 'like',  "%$year%")
             )
             ->paginate(10);
+
         $academicYearsDTO = AcademicYearDTO::fromPagination($academicYears);
         return response()->json($academicYearsDTO, Response::HTTP_OK);
     }
