@@ -33,7 +33,8 @@ class CourseValidatorMiddleware
         ];
 
         if ($request->isMethod('put') || $request->isMethod('patch')) {
-            $rules['grade_level_id'] = 'sometimes|integer|exists:grade_level,id';
+            $rules['grade_id'] = 'sometimes|integer|exists:grades,id';
+            $rules['level_id'] = 'sometimes|integer|exists:levels,id';
         }
 
         $validate = Validator::make($request->all(), $rules);

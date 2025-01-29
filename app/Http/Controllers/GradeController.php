@@ -117,7 +117,11 @@ class GradeController extends Controller
 
         $courses = $query->courses;
 
-        $gradeDTO = GradeDTO::fromModelWithRelation($grade, $level, $courses);
+        $gradeDTO = GradeDTO::fromModelWithRelation(
+            $query->grade,
+            $query->level,
+            $courses
+        );
         return response()->json($gradeDTO, Response::HTTP_OK);
     }
 

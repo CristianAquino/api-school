@@ -17,18 +17,25 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $courses = Course::all();
-        $coursesDTO = CourseDTO::fromCollection($courses);
+        $course = $request->query('course');
+        $courses = Course::query()
+            ->when(
+                $course,
+                fn($query, $course) => $query->where('course', 'like',  "%$course%")
+            )
+            ->paginate(10);
+
+        $coursesDTO = CourseDTO::fromPagination($courses);
         return response()->json($coursesDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', Course::class);
@@ -39,8 +46,16 @@ class CourseController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedCourses = Course::onlyTrashed()->get();
-        $deletedCoursesDTO = CourseDTO::fromCollection($deletedCourses);
+        $course = $request->query('course');
+
+        $deletedCourses = Course::onlyTrashed()
+            ->when(
+                $course,
+                fn($query, $course) => $query->where('course', 'like',  "%$course%")
+            )
+            ->paginate(10);
+
+        $deletedCoursesDTO = CourseDTO::fromPagination($deletedCourses);
         return response()->json($deletedCoursesDTO, Response::HTTP_OK);
     }
 
@@ -50,15 +65,26 @@ class CourseController extends Controller
     public function store(Request $request, Level $level, Grade $grade)
     {
         //
-        $gradeLevel = GradeLevel::where('level_id', $level->id)->where('grade_id', $grade->id)->first();
+        $response = Gate::inspect('store', Course::class);
 
-        $request->validated_data->only(["course", "description"]);
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $gradeLevel = GradeLevel::where('level_id', $level->id)
+            ->where('grade_id', $grade->id)
+            ->first();
 
         $course = new Course($request->only(["course", "description"]));
         $course->grade_level_id = $gradeLevel->id;
         $course->save();
 
         if (!is_null($request->schedule_id)) {
+            if (is_null($request->day)) {
+                return response()->json(["message" => "The day not exist"], Response::HTTP_BAD_REQUEST);
+            }
             $schedule = Schedule::where("id", $request->schedule_id)->first();
             $course->schedules()->attach(
                 $schedule,
@@ -95,11 +121,25 @@ class CourseController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $course->update($request->only([
-            'course',
-            'description',
-            'grade_level_id'
-        ]));
+        if (is_null($request->level_id) && is_null($request->grade_id)) {
+            $course->update($request->only(["course", "description"]));
+        } else {
+            $gradeLevel = GradeLevel::where('level_id', $request->level_id)
+                ->where('grade_id', $request->grade_id)
+                ->first();
+
+            if (is_null($gradeLevel)) {
+                return response()->json(["message" => "The grade level or grade does not exist"], Response::HTTP_BAD_REQUEST);
+            }
+
+            $course->update(
+                [
+                    'course' => $request->course,
+                    'description' => $request->description ?? $course->description,
+                    'grade_level_id' => $gradeLevel->id
+                ]
+            );
+        }
 
         if (!is_null($request->schedule_id)) {
             if (is_null($request->day)) {
