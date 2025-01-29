@@ -23,6 +23,7 @@ class GradeValidatorMiddleware
         if ($request->isMethod('put') || $request->isMethod('patch')) {
             $grade = $request->route('grade');
             $rules['grade'] = 'required|string|max:8|unique:grades,grade,' . $grade->id;
+            $rules['level_id'] = 'sometimes|integer|exists:levels,id';
         }
 
         $validate = Validator::make($request->all(), $rules);

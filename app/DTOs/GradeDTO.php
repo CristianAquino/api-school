@@ -10,36 +10,43 @@ class GradeDTO
     public function __construct(
         public readonly int $id,
         public readonly string $grade,
-        public readonly string $level,
-        public readonly array $courses,
     ) {
         //
     }
 
-    public static function fromModel($model): array
+    public static function fromBaseModel($model): self
+    {
+        return new self(
+            $model->id,
+            $model->grade
+        );
+    }
+
+    public static function fromPaginationCollection($collections): array
+    {
+        return array_map(function ($collection) {
+            return self::fromBaseModel($collection);
+        }, $collections);
+    }
+
+
+    public static function fromPagination($model): array
     {
         return [
-            'id' => $model->id,
-            'grade' => $model->grade,
+            'data' => self::fromPaginationCollection($model->items()),
+            'pagination' => PaginationDTO::base($model)
         ];
     }
 
-    public static function fromCollection($collections): array
-    {
-        return array_map(function ($collection) {
-            return self::fromModel($collection);
-        }, $collections->all());
-    }
-
-    public static function fromModelWithRelation($grade, $level, $courses): self
+    public static function fromModelWithRelation($grade, $level, $courses): array
     {
         $courses = CourseDTO::fromCollection($courses);
 
-        return new self(
-            $grade->id,
-            $grade->grade,
-            $level->level,
-            $courses
-        );
+        return [
+            'id' => $grade->id,
+            'grade' => $grade->grade,
+            'level' => $level->level,
+            'courses' => $courses
+        ];
     }
 }

@@ -15,18 +15,25 @@ class GradeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $grades = Grade::all();
-        $gradesDTO = GradeDTO::fromCollection($grades);
+        $grade = $request->query('grade');
+        $grades = Grade::query()
+            ->when(
+                $grade,
+                fn($query, $grade) => $query->where('grade', 'like',  "%$grade%")
+            )
+            ->paginate(10);
+
+        $gradesDTO = GradeDTO::fromPagination($grades);
         return response()->json($gradesDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', Grade::class);
@@ -37,8 +44,16 @@ class GradeController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedGrades = Grade::onlyTrashed()->get();
-        $deleteGradesDTO = GradeDTO::fromCollection($deletedGrades);
+        $grade = $request->query('grade');
+
+        $deletedGrades = Grade::onlyTrashed()
+            ->when(
+                $grade,
+                fn($query, $grade) => $query->where('grade', 'like',  "%$grade%")
+            )
+            ->paginate(10);
+
+        $deleteGradesDTO = GradeDTO::fromPagination($deletedGrades);
         return response()->json($deleteGradesDTO, Response::HTTP_OK);
     }
 
@@ -90,7 +105,17 @@ class GradeController extends Controller
     public function show(Level $level, Grade $grade)
     {
         //
-        $courses = GradeLevel::where('level_id', $level->id)->where('grade_id', $grade->id)->first()->courses;
+        $query = GradeLevel::where('level_id', $level->id)
+            ->where('grade_id', $grade->id)
+            ->first();
+
+        if (is_null($query)) {
+            return response()->json([
+                "message" => "the grade or level does not exist"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $courses = $query->courses;
 
         $gradeDTO = GradeDTO::fromModelWithRelation($grade, $level, $courses);
         return response()->json($gradeDTO, Response::HTTP_OK);
@@ -113,28 +138,15 @@ class GradeController extends Controller
         $g = $grade->grade;
 
         $grade->update($request->validated_data);
-        return response()->json([
-            "message" => "The grade $g has been successfully updated to $request->grade"
-        ], Response::HTTP_ACCEPTED);
-    }
 
-    /**
-     * Unlinks a specific resource with another.
-     */
-    public function detach(Level $level, Grade $grade)
-    {
-        //
-        $response = Gate::inspect('detach', Grade::class);
-
-        if (!$response->allowed()) {
-            return response()->json([
-                "message" => $response->message()
-            ], Response::HTTP_FORBIDDEN);
+        if (!is_null($request->level_id)) {
+            $grade->levels()->detach($grade->levels);
+            $level = Level::find($request->validated_data["level_id"]);
+            $level->grades()->attach($grade);
         }
 
-        $level->grades()->detach($grade->id);
         return response()->json([
-            "message" => "The grade $grade->grade has been successfully deleted from level $level->level"
+            "message" => "The grade $g has been successfully updated to $request->grade"
         ], Response::HTTP_ACCEPTED);
     }
 
