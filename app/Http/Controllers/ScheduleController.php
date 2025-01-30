@@ -35,8 +35,8 @@ class ScheduleController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedSchedules = Schedule::onlyTrashed()->get();
-        $deletedSchedulesDTO = ScheduleDTO::fromCollection($deletedSchedules);
+        $deletedSchedules = Schedule::onlyTrashed()->paginate(10);
+        $deletedSchedulesDTO = ScheduleDTO::fromPagination($deletedSchedules);
         return response()->json($deletedSchedulesDTO, Response::HTTP_OK);
     }
 
@@ -66,6 +66,14 @@ class ScheduleController extends Controller
     public function show(Schedule $schedule)
     {
         //
+        $response = Gate::inspect('view', Schedule::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $courses = $schedule->courses;
         $scheduleDTO = ScheduleDTO::fromCollectionWithRelation($schedule, $courses);
         return response()->json($scheduleDTO, Response::HTTP_OK);

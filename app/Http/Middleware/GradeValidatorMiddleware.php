@@ -17,12 +17,12 @@ class GradeValidatorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $rules = [
-            'grade' => 'required|string|max:8',
+            'grade' => ['required', 'string', 'max:8'],
         ];
 
         if ($request->isMethod('put') || $request->isMethod('patch')) {
             $grade = $request->route('grade');
-            $rules['grade'] = 'required|string|max:8|unique:grades,grade,' . $grade->id;
+            $rules['grade'] = 'unique:grades,grade,' . $grade->id;
             $rules['level_id'] = 'sometimes|integer|exists:levels,id';
         }
 

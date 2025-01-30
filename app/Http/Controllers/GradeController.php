@@ -105,6 +105,14 @@ class GradeController extends Controller
     public function show(Level $level, Grade $grade)
     {
         //
+        $response = Gate::inspect('view', Grade::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $query = GradeLevel::where('level_id', $level->id)
             ->where('grade_id', $grade->id)
             ->first();

@@ -18,16 +18,17 @@ class AcademicYearValidatorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $rules = [
+            'year' => ['required', 'string', 'max:4'],
             'start_date' => [
                 'required',
-                function ($attribute, $value, $fail) {
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
                     $date = DateTime::createFromFormat('Y/m/d', $value);
+                    $year = $request->year;
+
                     if (!$date || $date->format('Y/m/d') != $value) {
                         $fail("The start date $value is not in Y/m/d format or is an invalid date");
                     }
-                },
-                function ($attribute, $value, $fail) use ($request) {
-                    $year = $request->year;
                     if (date('Y', strtotime($value)) != $year) {
                         $fail("The start date must start in the year $year");
                     }
@@ -46,10 +47,10 @@ class AcademicYearValidatorMiddleware
         ];
 
         if ($request->isMethod('post')) {
-            $rules['year'] = 'required|string|max:4|unique:academic_years,year';
+            $rules['year'][] = 'unique:academic_years,year';
         } elseif ($request->isMethod('put') || $request->isMethod('patch')) {
             $academicYear = $request->route('academicYear');
-            $rules['year'] = 'required|string|max:4|unique:academic_years,year,' . $academicYear->id;
+            $rules['year'][] = 'unique:academic_years,year,' . $academicYear->id;
         }
 
         $validate = Validator::make($request->all(), $rules);

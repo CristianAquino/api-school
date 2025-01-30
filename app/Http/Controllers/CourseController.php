@@ -103,6 +103,14 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         //
+        $response = Gate::inspect('view', Course::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $coursesDTO = CourseDTO::fromModelWithRelation($course);
         return response()->json($coursesDTO, Response::HTTP_OK);
     }

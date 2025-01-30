@@ -13,10 +13,6 @@ class CourseDTO
         public readonly int $id,
         public readonly string $course,
         public readonly ?string $description,
-        // public readonly string $level,
-        // public readonly string $grade,
-        // public readonly TeacherDTO|array|null $teacher,
-        // public readonly ?ScheduleDTO $schedule
     ) {
         //
     }
