@@ -20,19 +20,21 @@ class UserValidatorMiddleware
             'name' => 'required|string|max:64',
             'first_name' => 'required|string|max:32',
             'second_name' => 'required|string|max:32',
-            'phone' => 'required|string|max:32',
+            'phone' => 'sometimes|string|max:32',
             'birth_date' => 'sometimes|date',
             'address' => 'required|string|max:128',
-            'dni' => 'required|string|max:8|unique:users,dni',
-            'email' => 'required|email|unique:users,email',
+            'dni' => ['required', 'string', 'max:8'],
+            'email' => ['required', 'email'],
         ];
 
-
-        if ($request->isMethod('put') || $request->isMethod('patch')) {
+        if ($request->isMethod('post')) {
+            $rules['dni'][] = 'unique:users,dni';
+            $rules['email'][] = 'unique:users,email';
+        } elseif ($request->isMethod('put') || $request->isMethod('patch')) {
             $user = $request->route('teacher') ?? $request->route('student');
             $userId = $user->user ? $user->user->id : null;
-            $rules['dni'] = 'required|string|max:8|unique:users,dni,' . $userId;
-            $rules['email'] = 'required|email|unique:users,email,' . $userId;
+            $rules['dni'][] = 'unique:users,dni,' . $userId;
+            $rules['email'][] = 'unique:users,email,' . $userId;
         }
 
         $validate = Validator::make($request->all(), $rules);

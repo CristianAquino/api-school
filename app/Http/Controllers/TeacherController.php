@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,18 +17,26 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $teachers = Teacher::all();
-        $teachersDTO = TeacherDTO::fromCollection($teachers);
+        $code = $request->query('code');
+        $teachers = Teacher::query()
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('user', function ($query) use ($code) {
+                    $query->where('code', 'like', "%$code%");
+                });
+            })
+            ->paginate(10);
+
+        $teachersDTO = TeacherDTO::fromPagination($teachers);
         return response()->json($teachersDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', Teacher::class);
@@ -38,8 +47,17 @@ class TeacherController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedTeachers = Teacher::onlyTrashed()->get();
-        $deletedTeachersDTO = Teacher::fromCollection($deletedTeachers);
+        $code = $request->query('code');
+
+        $deletedTeachers = Teacher::onlyTrashed()
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('user', function ($query) use ($code) {
+                    $query->where('code', 'like', "%$code%");
+                });
+            })
+            ->paginate(10);
+
+        $deletedTeachersDTO = TeacherDTO::fromPagination($deletedTeachers);
         return response()->json($deletedTeachersDTO, Response::HTTP_OK);
     }
 
@@ -62,7 +80,9 @@ class TeacherController extends Controller
         if ($i == 0) {
             $code = 'TE' . (int)date('Y') * 10000 + $i;
         } else {
-            $c = Teacher::latest("id")->first()->user->code;
+            $c = User::where('userable_type', Teacher::class)
+                ->latest("id")
+                ->first()->code;
             $i = (int)substr($c, 2) + 1;
             $code = 'TE' . $i;
         }
@@ -84,6 +104,25 @@ class TeacherController extends Controller
         return response()->json([
             "message" => "teacher $request->first_name $request->second_name $request->name has been added successfully with code $code"
         ], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function me()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Teacher::where('id', $me)->first();
+
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $teacherDTO = TeacherDTO::fromModelWithRelation($user);
+        return response()->json($teacherDTO, Response::HTTP_OK);
     }
 
     /**
@@ -129,7 +168,9 @@ class TeacherController extends Controller
         }
 
         if (is_null($teacher->user)) {
-            $c = Teacher::latest("id")->first()->user->code;
+            $c = User::where('userable_type', Teacher::class)
+                ->latest("id")
+                ->first()->code;
             $i = (int)substr($c, 2) + 1;
             $code = 'TE' . $i;
 
@@ -161,7 +202,7 @@ class TeacherController extends Controller
 
         $teacher->delete();
         return response()->json([
-            "message" => "the teacher with code $teacher->code_teacher has been successfully deleted"
+            "message" => "the teacher with code " . $teacher->user->code . " has been successfully deleted"
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -189,7 +230,7 @@ class TeacherController extends Controller
 
         $teacher->restore();
         return response()->json([
-            "message" => "the teacher with code $teacher->code_teacher has been successfully restored"
+            "message" => "the teacher with code " . $teacher->user->code . " has been successfully restored"
         ], Response::HTTP_OK);
     }
 
@@ -208,6 +249,12 @@ class TeacherController extends Controller
         }
 
         $teacher = Teacher::onlyTrashed()->find($id);
+        foreach ($teacher->courses as $course) {
+            $course->teacher_id = null;
+            $course->save();
+        }
+
+        $code = $teacher->user->code;
 
         if (is_null($teacher)) {
             return response()->json([
@@ -216,8 +263,9 @@ class TeacherController extends Controller
         }
 
         $teacher->forceDelete();
+        User::where('userable_id', $teacher->id)->delete();
         return response()->json([
-            "message" => "the teacher with code $teacher->code_teacher has been successfully deleted permanently"
+            "message" => "the teacher with code $code has been successfully deleted permanently"
         ], Response::HTTP_ACCEPTED);
     }
 }
