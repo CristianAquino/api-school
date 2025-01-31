@@ -18,11 +18,11 @@ class GradeController extends Controller
     public function index(Request $request)
     {
         //
-        $grade = $request->query('grade');
+        $grade = strtolower($request->query('grade'));
         $grades = Grade::query()
             ->when(
                 $grade,
-                fn($query, $grade) => $query->where('grade', 'like',  "%$grade%")
+                fn($query, $grade) => $query->whereRaw('LOWER(grade) LIKE ?',  "%$grade%")
             )
             ->paginate(10);
 
@@ -44,12 +44,11 @@ class GradeController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $grade = $request->query('grade');
-
+        $grade = strtolower($request->query('grade'));
         $deletedGrades = Grade::onlyTrashed()
             ->when(
                 $grade,
-                fn($query, $grade) => $query->where('grade', 'like',  "%$grade%")
+                fn($query, $grade) => $query->whereRaw('LOWER(grade) LIKE ?',  "%$grade%")
             )
             ->paginate(10);
 

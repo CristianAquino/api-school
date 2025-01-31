@@ -17,18 +17,43 @@ class EnrollementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $enrollements = Enrollement::all();
-        $enrollementsDTO = EnrollementDTO::fromCollection($enrollements);
+        $year = $request->query('year');
+        $code = strtolower($request->query('code'));
+        $level = strtolower($request->query('level'));
+
+        $enrollements = Enrollement::query()
+            ->when($year, function ($query) use ($year) {
+                $query->whereHas('academic_year', function ($query) use ($year) {
+                    $query->where('year', 'like', "%$year%");
+                });
+            })
+            ->when($level, function ($query) use ($level) {
+                $query->whereHas('gradeLevel', function ($query) use ($level) {
+                    $query->whereHas('level', function ($query) use ($level) {
+                        $query->whereRaw('Lower(level) like ?', "%$level%");
+                    });
+                });
+            })
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('student', function ($query) use ($code) {
+                    $query->whereHas('user', function ($query) use ($code) {
+                        $query->whereRaw('Lower(code) like ?', "%$code%");
+                    });
+                });
+            })
+            ->paginate(10);
+
+        $enrollementsDTO = EnrollementDTO::fromPagination($enrollements);
         return response()->json($enrollementsDTO, Response::HTTP_OK);
     }
 
     /**
      * Display a listing of the resource remove soft.
      */
-    public function softList()
+    public function softList(Request $request)
     {
         //
         $response = Gate::inspect('softList', Enrollement::class);
@@ -39,8 +64,33 @@ class EnrollementController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $deletedEnrollements = Enrollement::onlyTrashed()->get();
-        $deletedEnrollementsDTO = EnrollementDTO::fromCollection($deletedEnrollements);
+        $year = $request->query('year');
+        $code = strtolower($request->query('code'));
+        $level = strtolower($request->query('level'));
+
+        $deletedEnrollements = Enrollement::onlyTrashed()
+            ->when($year, function ($query) use ($year) {
+                $query->whereHas('academic_year', function ($query) use ($year) {
+                    $query->where('year', 'like', "%$year%");
+                });
+            })
+            ->when($level, function ($query) use ($level) {
+                $query->whereHas('gradeLevel', function ($query) use ($level) {
+                    $query->whereHas('level', function ($query) use ($level) {
+                        $query->whereRaw('Lower(level) like ?', "%$level%");
+                    });
+                });
+            })
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('student', function ($query) use ($code) {
+                    $query->whereHas('user', function ($query) use ($code) {
+                        $query->whereRaw('Lower(code) like ?', "%$code%");
+                    });
+                });
+            })
+            ->paginate(10);
+
+        $deletedEnrollementsDTO = EnrollementDTO::fromPagination($deletedEnrollements);
         return response()->json($deletedEnrollementsDTO, Response::HTTP_OK);
     }
 
@@ -63,7 +113,9 @@ class EnrollementController extends Controller
         if ($i == 0) {
             $code = 'ST' . (int)date('Y') * 10000 + $i;
         } else {
-            $c = Student::latest("id")->first()->user->code;
+            $c = User::where('userable_type', Student::class)
+                ->latest("id")
+                ->first()->code;
             $i = (int)substr($c, 2) + 1;
             $code = 'ST' . $i;
         }
@@ -95,6 +147,8 @@ class EnrollementController extends Controller
             "message" => "The registration for student $request->first_name $request->second_name $request->name has been created successfully"
         ], Response::HTTP_CREATED);
     }
+    // imprimir el historial de matricula de un estudiante,
+    // esto incluira todas las matriculas, notas, etc para cada estudiante
 
     /**
      * Display the specified resource.
@@ -183,6 +237,11 @@ class EnrollementController extends Controller
                 "message" => "the enrollement does not exist"
             ], Response::HTTP_BAD_REQUEST);
         }
+
+        $enrollement->academic_year_id = null;
+        $enrollement->grade_level_id = null;
+        $enrollement->student_id = null;
+        $enrollement->save();
 
         $enrollement->forceDelete();
         return response()->json([

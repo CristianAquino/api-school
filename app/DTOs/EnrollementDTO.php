@@ -37,6 +37,21 @@ class EnrollementDTO
         );
     }
 
+    public static function fromPagination($model): array
+    {
+        return [
+            'data' => self::fromPaginationCollection($model->items()),
+            'pagination' => PaginationDTO::base($model)
+        ];
+    }
+
+    public static function fromPaginationCollection($collections): array
+    {
+        return array_map(function ($collection) {
+            return self::fromModel($collection);
+        }, $collections);
+    }
+
     public static function fromCollection($collections): array
     {
         return array_map(function ($collection) {

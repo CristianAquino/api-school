@@ -20,11 +20,11 @@ class CourseController extends Controller
     public function index(Request $request)
     {
         //
-        $course = $request->query('course');
+        $course = strtolower($request->query('course'));
         $courses = Course::query()
             ->when(
                 $course,
-                fn($query, $course) => $query->where('course', 'like',  "%$course%")
+                fn($query, $course) => $query->whereRaw('LOWER(course) LIKE ?',  "%$course%")
             )
             ->paginate(10);
 
@@ -46,12 +46,11 @@ class CourseController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $course = $request->query('course');
-
+        $course = strtolower($request->query('course'));
         $deletedCourses = Course::onlyTrashed()
             ->when(
                 $course,
-                fn($query, $course) => $query->where('course', 'like',  "%$course%")
+                fn($query, $course) => $query->whereRaw('LOWER(course) LIKE ?',  "%$course%")
             )
             ->paginate(10);
 

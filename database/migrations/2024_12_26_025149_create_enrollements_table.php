@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('enrollements', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('academic_year_id')
+                ->nullable()
                 ->constrained('academic_years')
                 ->cascadeOnDelete();
             $table->foreignUuid('student_id')
+                ->nullable()
                 ->constrained('students')
                 ->cascadeOnDelete();
             $table->foreignId('grade_level_id')
+                ->nullable()
                 ->constrained('grade_level')
                 ->cascadeOnDelete();
             $table->softDeletes();

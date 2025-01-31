@@ -31,9 +31,10 @@ class EnrollementsTableSeeder extends Seeder
             foreach ($level->grades as $grade) {
                 for ($i = 0; $i < 5; $i++) {
                     # code...
-                    $code = (int) date("Y") * 10000 + $s;
+                    $od = (int) date("Y") * 10000 + $s;
+                    $code = 'ST' . $od;
+                    $dni = (string)$faker->randomNumber(8, true);
                     $student = Student::create([
-                        'code_student' => 'ST' . $code,
                         'role' => 'ROLE_STUDENT'
                     ]);
                     $student->user()->create([
@@ -42,9 +43,10 @@ class EnrollementsTableSeeder extends Seeder
                         'second_name' => $faker->lastName,
                         'birth_date' => $faker->date(),
                         'address' => $faker->address,
-                        'dni' => (string)$faker->randomNumber(8, true),
+                        'dni' => $dni,
                         'email' => $faker->email,
-                        'password' => '12345678',
+                        'password' => $code . $dni,
+                        'code' => $code,
                     ]);
                     Enrollement::create([
                         'academic_year_id' => $academic_year->id,
