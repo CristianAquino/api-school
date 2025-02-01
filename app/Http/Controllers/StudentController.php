@@ -5,20 +5,58 @@ namespace App\Http\Controllers;
 use App\DTOs\StudentDTO;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $students = Student::all();
-        $studentsDTO = StudentDTO::fromCollection($students);
+        $code = strtolower($request->query('code'));
+        $students = Student::query()
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('user', function ($query) use ($code) {
+                    $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
+                });
+            })
+            ->paginate(10);
+
+        $studentsDTO = StudentDTO::fromPagination($students);
         return response()->json($studentsDTO, Response::HTTP_OK);
+    }
+
+    /**
+     * Display a listing of the resource remove soft.
+     */
+    public function softList(Request $request)
+    {
+        //
+        $response = Gate::inspect('softList', Student::class);
+
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $code = strtolower($request->query('code'));
+        $deletedStudents = Student::onlyTrashed()
+            ->when($code, function ($query) use ($code) {
+                $query->whereHas('user', function ($query) use ($code) {
+                    $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
+                });
+            })
+            ->paginate(10);
+
+        $deletedStudentsDTO = StudentDTO::fromPagination($deletedStudents);
+        return response()->json($deletedStudentsDTO, Response::HTTP_OK);
     }
 
     /**
@@ -27,6 +65,45 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function me()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+
+        // if (is_null($user)) {
+        //     return response()->json([
+        //         "message" => "You do not have the role allowed to perform this action"
+        //     ], Response::HTTP_NOT_FOUND);
+        // }
+
+        $studentDTO = StudentDTO::fromModelWithRelation($user);
+        return response()->json($studentDTO, Response::HTTP_OK);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function pdf()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $studentDTO = StudentDTO::fromPDFModel($user);
+        $pdf = PDF::loadView('pdf.student', ['student' => $studentDTO]);
+        return $pdf->download('enrollement.pdf');
     }
 
     /**

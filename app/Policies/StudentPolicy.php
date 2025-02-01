@@ -29,6 +29,17 @@ class StudentPolicy
     }
 
     /**
+     * Determine whether the user can view the model.
+     */
+    public function softList(User $user): Response
+    {
+        $admin = $user->userable;
+        return $user->isGranted(User::ROLE_ADMIN, $admin->role)
+            ? Response::allow()
+            : Response::deny("You do not have the role allowed to perform this action");
+    }
+
+    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool

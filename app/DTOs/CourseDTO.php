@@ -75,4 +75,18 @@ class CourseDTO
             'schedule' => $schedule
         ];
     }
+
+    public static function fromModelTeacherPDf($model): array
+    {
+        if ($model->teacher) {
+            $teacher = TeacherDTO::fromModel($model->teacher);
+        } else {
+            $teacher = null;
+        }
+
+        return array_merge(
+            (array)self::fromBaseModel($model),
+            ['teacher' => $teacher]
+        );
+    }
 }

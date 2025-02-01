@@ -20,11 +20,11 @@ class TeacherController extends Controller
     public function index(Request $request)
     {
         //
-        $code = $request->query('code');
+        $code = strtolower($request->query('code'));
         $teachers = Teacher::query()
             ->when($code, function ($query) use ($code) {
                 $query->whereHas('user', function ($query) use ($code) {
-                    $query->where('code', 'like', "%$code%");
+                    $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
                 });
             })
             ->paginate(10);
@@ -47,12 +47,11 @@ class TeacherController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $code = $request->query('code');
-
+        $code = strtolower($request->query('code'));
         $deletedTeachers = Teacher::onlyTrashed()
             ->when($code, function ($query) use ($code) {
                 $query->whereHas('user', function ($query) use ($code) {
-                    $query->where('code', 'like', "%$code%");
+                    $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
                 });
             })
             ->paginate(10);
@@ -99,6 +98,9 @@ class TeacherController extends Controller
 
         if (is_null($teacher->user)) {
             $teacher->delete();
+            return response()->json([
+                "message" => "The registration for teacher $request->first_name $request->second_name $request->name has not been created successfully"
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return response()->json([
