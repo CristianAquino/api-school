@@ -251,17 +251,17 @@ class TeacherController extends Controller
         }
 
         $teacher = Teacher::onlyTrashed()->find($id);
-        foreach ($teacher->courses as $course) {
-            $course->teacher_id = null;
-            $course->save();
-        }
-
-        $code = $teacher->user->code;
-
         if (is_null($teacher)) {
             return response()->json([
                 "message" => "the teacher does not exist"
             ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $code = $teacher->user->code;
+
+        foreach ($teacher->courses as $course) {
+            $course->teacher_id = null;
+            $course->save();
         }
 
         $teacher->forceDelete();

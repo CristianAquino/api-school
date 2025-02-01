@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\StudentDTO;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -208,7 +209,6 @@ class StudentController extends Controller
         }
 
         $student = Student::onlyTrashed()->find($id);
-
         if (is_null($student)) {
             return response()->json([
                 "message" => "the student does not exist"
@@ -216,6 +216,7 @@ class StudentController extends Controller
         }
 
         $student->forceDelete();
+        User::where('userable_id', $student->id)->delete();
         return response()->json([
             "message" => "the student " . $student->first_name . " " . $student->second_name . " " . $student->name . " has been successfully deleted permanently"
         ], Response::HTTP_ACCEPTED);

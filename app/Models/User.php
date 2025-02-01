@@ -29,7 +29,8 @@ class User extends Authenticatable implements JWTSubject
         'phone',
         'birth_date',
         'address',
-        'dni'
+        'dni',
+        'code'
     ];
 
     /**
@@ -63,12 +64,16 @@ class User extends Authenticatable implements JWTSubject
 
     // definiendo roles
     const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_TEACHER = 'ROLE_TEACHER';
     const ROLE_STUDENT = 'ROLE_STUDENT';
+    const ROLE_ALL = 'ROLE_ALL';
     private const ROLES_HIERARCHY = [
-        self::ROLE_SUPERADMIN => [self::ROLE_TEACHER],
+        self::ROLE_SUPERADMIN => [self::ROLE_ADMIN],
+        self::ROLE_ADMIN => [self::ROLE_TEACHER],
         self::ROLE_TEACHER => [self::ROLE_STUDENT],
-        self::ROLE_STUDENT => [],
+        self::ROLE_STUDENT => [self::ROLE_ALL],
+        self::ROLE_ALL => []
     ];
 
     private static function isRoleHierarchy($role, $role_hierarchy)
@@ -84,12 +89,12 @@ class User extends Authenticatable implements JWTSubject
         return false;
     }
 
-    public function isGranted($role): bool
+    public function isGranted($role, $role2): bool
     {
-        if ($role == $this->role) {
+        if ($role == $role2) {
             return true;
         }
-        return self::isRoleHierarchy($role, self::ROLES_HIERARCHY[$this->role]);
+        return self::isRoleHierarchy($role, self::ROLES_HIERARCHY[$role2]);
     }
 
     // implementacion de metodos para JWTAuth

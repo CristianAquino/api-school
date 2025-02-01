@@ -2,9 +2,7 @@
 
 namespace App\DTOs;
 
-use App\Models\Grade;
 use App\Models\GradeLevel;
-use App\Models\Level;
 
 class StudentDTO
 {
