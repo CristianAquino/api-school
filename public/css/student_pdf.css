@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.header,
+.footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    height: 3rem;
+    text-align: center;
+    font-size: 20px;
+}
+.header {
+    top: 0;
+}
+.footer {
+    bottom: 0;
+}
+.main {
+    position: fixed;
+    top: 3rem;
+    left: 0;
+    right: 0;
+    margin: 0 12%;
+}
+/* image */
+.table_head {
+    margin: 0 auto;
+    text-align: center;
+}
+.table_head td {
+    padding: 0 0.5rem;
+    font-size: 1.5rem;
+}
+.table_head img {
+    width: 6rem;
+    height: auto;
+}
+.title {
+    text-align: center;
+    text-transform: capitalize;
+    margin: 1rem;
+}
+.table {
+    margin: 0 auto;
+    width: 100%;
+}
+.table th,
+.table td {
+    text-transform: capitalize;
+    padding: 0 0.5rem;
+}
+.table th {
+    text-align: right;
+}
+.table td {
+    text-align: left;
+}
+/* table courses */
+.table_courses {
+    border-collapse: collapse;
+}
+.table_courses th {
+    text-align: center;
+}
+.table_courses th,
+.table_courses td {
+    border: 1px solid #000;
+}
+.invalid {
+    position: absolute;
+    font-size: 5rem;
+    color: #ccc9;
+    text-transform: capitalize;
+    transform: rotate(-45deg) translate(-50%, 300%);
+}
