@@ -7,6 +7,29 @@ use Illuminate\Auth\Access\Response;
 
 class GeneralPolicy
 {
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user): Response
+    {
+        $admin = $user->userable;
+        return $user->isGranted(User::ROLE_SUPERADMIN, $admin->role)
+            ? Response::allow()
+            : Response::deny("You do not have the role allowed to perform this action");
+    }
+
+    /**
+     * Determine whether the user can assign the model.
+     */
+    public function assign(User $user): Response
+    {
+        $admin = $user->userable;
+        return $user->isGranted(User::ROLE_SUPERADMIN, $admin->role)
+            ? Response::allow()
+            : Response::deny("You do not have the role allowed to perform this action");
+    }
+
     /**
      * Determine whether the user can view the model.
      */
