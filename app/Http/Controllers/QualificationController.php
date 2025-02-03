@@ -52,9 +52,15 @@ class QualificationController extends Controller
             }
         }
 
-        // dd($user->id);
-
         $prom = (int)config('app.avg_note');
+
+        $a = Qualification::where('student_id', $student->id)
+            ->where('course_id', $course->id)
+            ->count();
+
+        if ($a > $prom - 1) {
+            return response()->json(["message" => "The student already has a qualification in this course"], Response::HTTP_FORBIDDEN);
+        }
 
         $new_datos = $request->validated_data;
 
@@ -75,7 +81,6 @@ class QualificationController extends Controller
 
         $new_datos['letter_note'] = strtoupper($new_datos['letter_note']);
         $new_datos['avg'] = ($new_datos['number_note'] / $prom);
-        dd($new_datos);
 
         $qualification = new Qualification($new_datos);
         $qualification->student_id = $student->id;
