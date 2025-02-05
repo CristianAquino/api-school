@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Http\Middleware\AuthenticateWithCookie;
 use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -172,6 +171,7 @@ class LevelControllerTest extends TestCase
         $message = [
             "message" => "the level " . $this->random->level . " has been successfully deleted permanently"
         ];
+
         $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
         $response = $this->deleteJson(self::BASE_URL . "/destroy/" . $this->random->id);
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('academic_year_id')
                 ->nullable()
                 ->constrained('academic_years')
-                ->cascadeOnDelete();
+                ->onDelete('set null');
             $table->foreignUuid('student_id')
                 ->nullable()
                 ->constrained('students')
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('grade_level_id')
                 ->nullable()
                 ->constrained('grade_level')
-                ->cascadeOnDelete();
+                ->onDelete('set null');
             $table->softDeletes();
             $table->timestamps();
         });

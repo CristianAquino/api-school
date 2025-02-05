@@ -18,11 +18,11 @@ return new class extends Migration
             $table->foreignUuid('teacher_id')
                 ->nullable()
                 ->constrained('teachers')
-                ->cascadeOnDelete();
+                ->onDelete('set null');
             $table->foreignId('grade_level_id')
                 ->nullable()
                 ->constrained('grade_level')
-                ->cascadeOnDelete();
+                ->onDelete('set null');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -22,14 +22,6 @@ class GradeDTO
         );
     }
 
-    public static function fromPaginationCollection($collections): array
-    {
-        return array_map(function ($collection) {
-            return self::fromBaseModel($collection);
-        }, $collections);
-    }
-
-
     public static function fromPagination($model): array
     {
         return [
@@ -38,14 +30,28 @@ class GradeDTO
         ];
     }
 
-    public static function fromModelWithRelation($grade, $level, $courses): array
+    public static function fromPaginationCollection($collections): array
     {
-        $courses = CourseDTO::fromCollection($courses);
+        return array_map(function ($collection) {
+            return self::fromBaseModel($collection);
+        }, $collections);
+    }
+
+    public static function fromModelCollection($collections): array
+    {
+        return array_map(function ($collection) {
+            return self::fromBaseModel($collection);
+        }, $collections->all());
+    }
+
+    public static function fromModelWithRelation($model): array
+    {
+        $courses = CourseDTO::fromModelCollection($model->courses);
 
         return [
-            'id' => $grade->id,
-            'grade' => $grade->grade,
-            'level' => $level->level,
+            'id' => $model->grade->id,
+            'grade' => $model->grade->grade,
+            'level' => $model->level->level,
             'courses' => $courses
         ];
     }

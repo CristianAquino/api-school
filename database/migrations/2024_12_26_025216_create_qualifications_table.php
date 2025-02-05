@@ -22,7 +22,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->foreignId('course_id')
                 ->constrained('courses')
-                ->cascadeOnDelete();
+                ->onDelete('set null');
             $table->softDeletes();
             $table->timestamps();
         });

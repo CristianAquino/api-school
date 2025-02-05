@@ -37,7 +37,6 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('softList', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -63,14 +62,13 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('store', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $query = Grade::whereRaw('Lower(grade) = ?', strtolower($request->validated_data["grade"]));
+        $query = Grade::whereRaw('LOWER(grade) = ?', strtolower($request->validated_data["grade"]));
 
         $exists = $query->exists();
 
@@ -105,7 +103,6 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('view', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -122,13 +119,7 @@ class GradeController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $courses = $query->courses;
-
-        $gradeDTO = GradeDTO::fromModelWithRelation(
-            $query->grade,
-            $query->level,
-            $courses
-        );
+        $gradeDTO = GradeDTO::fromModelWithRelation($query);
         return response()->json($gradeDTO, Response::HTTP_OK);
     }
 
@@ -139,7 +130,6 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('update', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -168,7 +158,6 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -188,7 +177,6 @@ class GradeController extends Controller
     {
         //
         $response = Gate::inspect('restore', Grade::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()

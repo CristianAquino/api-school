@@ -15,12 +15,13 @@ class LevelsTableSeeder extends Seeder
         //
         // vaciamos la tabla
         Level::truncate();
-        $levels = [
-            ['level' => 'Primary'],
-            ['level' => 'Secondary'],
-        ];
+
+        $levels = ['Primary', 'Secondary',];
+
         foreach ($levels as $level) {
-            Level::create($level);
+            Level::create(
+                ['level' => $level]
+            );
         }
     }
 }
