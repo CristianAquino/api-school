@@ -20,7 +20,7 @@ class LevelController extends Controller
         $levels = Level::query()
             ->when(
                 $level,
-                fn($query, $level) => $query->whereRaw('Lower(level) like ?',  "%$level%")
+                fn($query, $level) => $query->whereRaw('LOWER(level) LIKE ?',  "%$level%")
             )
             ->paginate(10);
 
@@ -35,7 +35,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('softList', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -43,11 +42,10 @@ class LevelController extends Controller
         }
 
         $level = strtolower($request->query('level'));
-
         $deletedLevel = Level::onlyTrashed()
             ->when(
                 $level,
-                fn($query, $level) => $query->whereRaw('Lower(level) like ?',  "%$level%")
+                fn($query, $level) => $query->whereRaw('LOWER(level) LIKE ?',  "%$level%")
             )
             ->paginate(10);
 
@@ -62,7 +60,6 @@ class LevelController extends Controller
     {
         // 
         $response = Gate::inspect('store', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -82,7 +79,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('view', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -100,7 +96,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('update', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -122,7 +117,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -142,7 +136,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('restore', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -170,7 +163,6 @@ class LevelController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Level::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()

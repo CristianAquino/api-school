@@ -200,7 +200,6 @@ class AcademicYearControllerTest extends TestCase
 
     public function test_can_destroy_academic_year(): void
     {
-
         $message = [
             "message" => "the academic year " . $this->random->year . " has been successfully deleted permanently"
         ];

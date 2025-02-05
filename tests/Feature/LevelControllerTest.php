@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\AuthenticateWithCookie;
+use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
@@ -15,21 +17,68 @@ class LevelControllerTest extends TestCase
      * A basic feature test example.
      */
     use RefreshDatabase;
+    private const BASE_URL = '/api/levels';
+    protected $random;
+    protected int $counter;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware([AuthenticateWithCookie::class, JWTMiddleware::class]);
+
+        $this->postJson('/api/login', [
+            "code" => "AD20250000",
+            "password" => "12345678"
+        ]);
+
+        $query = DB::table('levels');
+        // random data
+        $this->random = $query->inRandomOrder()->first();
+        $this->counter = $query->count();
+    }
 
     public function test_can_list_levels(): void
     {
-        $response = $this->get('/api/levels');
+        $response = $this->get(self::BASE_URL);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(2);
-        $response->assertJsonIsArray();
+        $response->assertJsonFragment(['level' => $this->random->level]);
+        $this->assertDatabaseCount("levels", $this->counter);
         $response->assertExactJsonStructure(
             [
-                '*' => [
-                    'id',
-                    'level',
-                ]
+                'data' => [
+                    '*' => [
+                        'id',
+                        'level',
+                    ]
+                ],
+                'pagination',
+            ]
+        );
+    }
+
+    public function test_can_view_soft_list_levels(): void
+    {
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+
+        $response = $this
+            ->getJson(self::BASE_URL . "/soft_list");
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['level' => $this->random->level]);
+        $response->assertExactJsonStructure(
+            [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'level',
+                    ]
+                ],
+                'pagination',
             ]
         );
     }
@@ -45,22 +94,23 @@ class LevelControllerTest extends TestCase
             "message" => "The level $level has been successfully created"
         ];
 
-        $response = $this->postJson('/api/levels', $data);
+        $response = $this->postJson(self::BASE_URL, $data);
 
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('levels', $data);
+        $this->assertDatabaseCount("levels", $this->counter + 1);
     }
 
     public function test_can_show_level(): void
     {
-        $query = DB::table('levels')->inRandomOrder()->first();
-        $response = $this->getJson("/api/levels/$query->id");
+        $response = $this->getJson(self::BASE_URL . "/" . $this->random->id);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['level' => $this->random->level]);
         $response->assertExactJsonStructure(
             [
                 'id',
@@ -69,6 +119,7 @@ class LevelControllerTest extends TestCase
             ]
         );
     }
+
     public function test_can_update_level(): void
     {
         $faker = Faker::create();
@@ -77,38 +128,56 @@ class LevelControllerTest extends TestCase
             'level' => $level,
         ];
 
-        // radom data
-        $query = DB::table('levels')->inRandomOrder()->first();
-        $lev = $query->level;
-
         $message = [
-            "message" => "The level $lev has been successfully updated to $level"
+            "message" => "The level " . $this->random->level . " has been successfully updated to $level"
         ];
 
-        $response = $this->putJson("/api/levels/$query->id", $data);
+        $response = $this->putJson(self::BASE_URL . "/" . $this->random->id, $data);
 
         // test response
         $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('levels', $data);
+        $this->assertDatabaseCount("levels", $this->counter);
     }
 
-    public function test_can_delete_level_with_relations(): void
+    public function test_can_soft_destroy_level(): void
     {
-        // radom data
-        $query = DB::table('levels')->inRandomOrder()->first();
-
         $message = [
-            "message" => "The level $query->level cannot be deleted because it has grades associated with it"
+            "message" => "The level " . $this->random->level . " has been successfully deleted"
         ];
-
-        $response = $this->deleteJson("/api/levels/$query->id");
+        $response = $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
 
         // test response
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
-        // verifica si hay la misma cantidad de datos
-        $this->assertDatabaseCount("levels", 2);
+    }
+
+    public function test_can_restore_level(): void
+    {
+        $message = [
+            "message" => "the level " . $this->random->level . " has been successfully restored"
+        ];
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->postJson(self::BASE_URL . "/restore/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($message);
+    }
+
+    public function test_can_destroy_academic_year(): void
+    {
+        $message = [
+            "message" => "the level " . $this->random->level . " has been successfully deleted permanently"
+        ];
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->deleteJson(self::BASE_URL . "/destroy/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+        $this->assertDatabaseCount("levels", $this->counter - 1);
     }
 }

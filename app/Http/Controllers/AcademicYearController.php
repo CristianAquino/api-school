@@ -188,7 +188,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('destroy', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
