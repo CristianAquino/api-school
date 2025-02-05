@@ -35,7 +35,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('softList', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -43,7 +42,6 @@ class AcademicYearController extends Controller
         }
 
         $year = $request->query('year');
-
         $deletedAcademicYears = AcademicYear::onlyTrashed()
             ->when(
                 $year,
@@ -62,7 +60,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('store', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -82,14 +79,13 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('view', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $academicYearDTO = AcademicYearDTO::fromBase($academicYear);
+        $academicYearDTO = AcademicYearDTO::fromBaseModel($academicYear);
         return response()->json($academicYearDTO, Response::HTTP_OK);
     }
 
@@ -100,7 +96,6 @@ class AcademicYearController extends Controller
     {
         // 
         $response = Gate::inspect('view', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -108,7 +103,7 @@ class AcademicYearController extends Controller
         }
 
         $lastYear = AcademicYear::latest('year')->first();
-        $lastYearDTO = AcademicYearDTO::fromBase($lastYear);
+        $lastYearDTO = AcademicYearDTO::fromBaseModel($lastYear);
         return response()->json($lastYearDTO, Response::HTTP_OK);
     }
 
@@ -119,7 +114,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('update', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -148,7 +142,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -168,7 +161,6 @@ class AcademicYearController extends Controller
     {
         //
         $response = Gate::inspect('restore', AcademicYear::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()

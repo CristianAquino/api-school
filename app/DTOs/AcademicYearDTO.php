@@ -16,7 +16,7 @@ class AcademicYearDTO
         //
     }
 
-    public static function fromBase($model): self
+    public static function fromBaseModel($model): self
     {
         return new self(
             $model->id,
@@ -37,7 +37,7 @@ class AcademicYearDTO
     public static function fromPaginationCollection($collections): array
     {
         return array_map(function ($collection) {
-            return self::fromBase($collection);
+            return self::fromBaseModel($collection);
         }, $collections);
     }
 

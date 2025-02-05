@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\AuthenticateWithCookie;
+use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
-
 
 class AcademicYearControllerTest extends TestCase
 {
@@ -17,24 +17,74 @@ class AcademicYearControllerTest extends TestCase
      */
     use RefreshDatabase;
 
+    protected string $token;
+    private const BASE_URL = '/api/academic_years';
+    protected $random;
+    protected int $counter;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware([AuthenticateWithCookie::class, JWTMiddleware::class]);
+
+        $auth = $this->postJson('/api/login', [
+            "code" => "AD20250000",
+            "password" => "12345678"
+        ]);
+
+        $this->token = $auth["token"];
+
+        $query = DB::table('academic_years');
+        // random data
+        $this->random = $query->inRandomOrder()->first();
+        $this->counter = $query->count();
+    }
+
     public function test_can_list_academic_years(): void
     {
         // seeder
         // $this->seed(AcademicYearsTableSeeder::class);
-        $response = $this->getJson('/api/academic_years');
+        $response = $this->getJson(self::BASE_URL);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(1);
-        $response->assertJsonIsArray();
+        $this->assertDatabaseCount("academic_years", $this->counter);
         $response->assertExactJsonStructure(
             [
-                '*' => [
-                    'id',
-                    'year',
-                    'start_date',
-                    'end_date',
-                ]
+                'data' => [
+                    '*' => [
+                        'id',
+                        'year',
+                        'start_date',
+                        'end_date',
+                    ]
+                ],
+                'pagination',
+            ]
+        );
+    }
+
+    public function test_can_view_soft_list_academic_years(): void
+    {
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+
+        $response = $this
+            ->getJson(self::BASE_URL . "/soft_list");
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertExactJsonStructure(
+            [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'year',
+                        'start_date',
+                        'end_date',
+                    ]
+                ],
+                'pagination',
             ]
         );
     }
@@ -52,20 +102,21 @@ class AcademicYearControllerTest extends TestCase
             "message" => "The academic year $year has been successfully created"
         ];
 
-        $response = $this->postJson('/api/academic_years', $data);
+        $response = $this
+            ->withHeader('Authorization', 'Bearer ' . $this->token)
+            ->postJson(self::BASE_URL, $data);
 
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('academic_years', $data);
+        $this->assertDatabaseCount("academic_years", $this->counter + 1);
     }
 
     public function test_can_show_academic_year(): void
     {
-        // random data
-        $query = DB::table('academic_years')->inRandomOrder()->first();
-        $response = $this->getJson("/api/academic_years/$query->id");
+        $response = $this->getJson(self::BASE_URL . "/" . $this->random->id);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
@@ -82,8 +133,7 @@ class AcademicYearControllerTest extends TestCase
     public function test_can_show_last_academic_year(): void
     {
         $latestYear = date("Y");
-
-        $response = $this->getJson('/api/academic_years/last_year');
+        $response = $this->getJson(self::BASE_URL . "/last_year");
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
@@ -108,14 +158,11 @@ class AcademicYearControllerTest extends TestCase
             'end_date' => $year . '/12/31',
         ];
 
-        // radom data
-        $query = DB::table('academic_years')->inRandomOrder()->first();
-
         $message = [
-            "message" => "the academic year $query->year has been successfully updated to $year"
+            "message" => "the academic year " . $this->random->year . " has been successfully updated to $year"
         ];
 
-        $response = $this->putJson("/api/academic_years/$query->id", $data);
+        $response = $this->putJson(self::BASE_URL . "/" . $this->random->id, $data);
 
         // test response
         $response->assertStatus(Response::HTTP_ACCEPTED);
@@ -123,24 +170,46 @@ class AcademicYearControllerTest extends TestCase
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('academic_years', $data);
         // verifica si hay la misma cantidad de datos
-        $this->assertDatabaseCount("academic_years", 1);
+        $this->assertDatabaseCount("academic_years", $this->counter);
     }
 
-    public function test_can_delete_academic_year_with_relations(): void
+    public function test_can_soft_destroy_academic_year(): void
     {
-        // radom data
-        $query = DB::table('academic_years')->inRandomOrder()->first();
-
         $message = [
-            "message" => "the academic year $query->year cannot be deleted because it has enrollements"
+            "message" => "the academic year " . $this->random->year . " has been successfully deleted"
         ];
-
-        $response = $this->deleteJson("/api/academic_years/$query->id");
+        $response = $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
 
         // test response
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
-        // verifica si hay la misma cantidad de datos
-        $this->assertDatabaseCount("academic_years", 1);
+    }
+
+    public function test_can_restore_academic_year(): void
+    {
+        $message = [
+            "message" => "the academic year " . $this->random->year . " has been successfully restored"
+        ];
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->postJson(self::BASE_URL . "/restore/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($message);
+    }
+
+    public function test_can_destroy_academic_year(): void
+    {
+
+        $message = [
+            "message" => "the academic year " . $this->random->year . " has been successfully deleted permanently"
+        ];
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->deleteJson(self::BASE_URL . "/destroy/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+        $this->assertDatabaseCount("academic_years", $this->counter - 1);
     }
 }
