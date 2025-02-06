@@ -39,7 +39,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('softList', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -65,7 +64,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('store', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -75,6 +73,10 @@ class CourseController extends Controller
         $gradeLevel = GradeLevel::where('level_id', $level->id)
             ->where('grade_id', $grade->id)
             ->first();
+
+        if (is_null($gradeLevel)) {
+            return response()->json(["message" => "The grade level or grade does not exist"], Response::HTTP_BAD_REQUEST);
+        }
 
         $course = new Course($request->only(["course", "description"]));
         $course->grade_level_id = $gradeLevel->id;
@@ -87,7 +89,7 @@ class CourseController extends Controller
             $schedule = Schedule::where("id", $request->schedule_id)->first();
             $course->schedules()->attach(
                 $schedule,
-                ["day" => $request->day,]
+                ["day" => strtolower($request->day),]
             );
         }
 
@@ -103,7 +105,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('view', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -121,7 +122,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('update', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -172,7 +172,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -192,7 +191,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('restore', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -220,7 +218,6 @@ class CourseController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Course::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()

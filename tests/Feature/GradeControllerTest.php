@@ -31,8 +31,8 @@ class GradeControllerTest extends TestCase
             "password" => "12345678"
         ]);
 
-        $query = DB::table('grades');
         // random data
+        $query = DB::table('grades');
         $this->random = $query->inRandomOrder()->first();
         $this->counter = $query->count();
     }

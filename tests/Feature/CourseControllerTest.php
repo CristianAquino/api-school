@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\AuthenticateWithCookie;
+use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Faker\Factory as Faker;
@@ -15,21 +16,70 @@ class CourseControllerTest extends TestCase
      * A basic feature test example.
      */
     use RefreshDatabase;
+    private const BASE_URL = '/api/courses';
+    protected $random;
+    protected $gradeLevel;
+    protected int $counter;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware([AuthenticateWithCookie::class, JWTMiddleware::class]);
+
+        $this->postJson('/api/login', [
+            "code" => "AD20250000",
+            "password" => "12345678"
+        ]);
+
+        // random data
+        $query = DB::table('courses');
+        $this->gradeLevel = DB::table('grade_level')->inRandomOrder()->first();
+        $this->random = $query->inRandomOrder()->first();
+        $this->counter = $query->count();
+    }
 
     public function test_can_list_courses(): void
     {
-        $response = $this->getJson('/api/courses');
+        $response = $this->getJson(self::BASE_URL);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonIsArray();
+        $this->assertDatabaseCount("courses", $this->counter);
         $response->assertExactJsonStructure(
             [
-                '*' => [
-                    'id',
-                    'course',
-                    'description'
-                ]
+                'data' => [
+                    '*' => [
+                        'id',
+                        'course',
+                        'description'
+                    ]
+                ],
+                'pagination',
+            ]
+        );
+    }
+
+    public function test_can_view_soft_list_coures(): void
+    {
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+
+        $response = $this
+            ->getJson(self::BASE_URL . "/soft_list");
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['course' => $this->random->course]);
+        $response->assertExactJsonStructure(
+            [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'course',
+                        'description'
+                    ]
+                ],
+                'pagination',
             ]
         );
     }
@@ -39,9 +89,8 @@ class CourseControllerTest extends TestCase
         $faker = Faker::create();
         $course = $faker->word();
 
-        $query = DB::table('grade_level')->inRandomOrder()->first();
-        $grade = $query->grade_id;
-        $level = $query->level_id;
+        $grade = $this->gradeLevel->grade_id;
+        $level = $this->gradeLevel->level_id;
 
         $data = [
             'course' => $course,
@@ -60,6 +109,7 @@ class CourseControllerTest extends TestCase
         $response->assertJson($message);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('courses', $data);
+        $this->assertDatabaseCount("courses", $this->counter + 1);
     }
 
     public function test_can_create_course_with_schedule(): void
@@ -67,9 +117,8 @@ class CourseControllerTest extends TestCase
         $faker = Faker::create();
         $course = $faker->word();
 
-        $query = DB::table('grade_level')->inRandomOrder()->first();
-        $grade = $query->grade_id;
-        $level = $query->level_id;
+        $grade = $this->gradeLevel->grade_id;
+        $level = $this->gradeLevel->level_id;
         $schedule = DB::table('schedules')->inRandomOrder()->first();
 
         $data = [
@@ -89,6 +138,7 @@ class CourseControllerTest extends TestCase
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
+        $this->assertDatabaseCount("courses", $this->counter + 1);
         $this->assertDatabaseHas('courses', [
             'course' => $data["course"],
         ]);
@@ -96,12 +146,11 @@ class CourseControllerTest extends TestCase
 
     public function test_can_show_course(): void
     {
-        // random data
-        $query = DB::table('courses')->inRandomOrder()->first();
-        $response = $this->getJson("api/courses/$query->id");
+        $response = $this->getJson(self::BASE_URL . "/" . $this->random->id);
 
         // test response
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonFragment(['course' => $this->random->course]);
         $response->assertExactJsonStructure(
             [
                 'id',
@@ -120,25 +169,27 @@ class CourseControllerTest extends TestCase
         $faker = Faker::create();
         $course = $faker->word();
 
-        $gradeLevel = DB::table('grade_level')->inRandomOrder()->first();
-        $cur = DB::table('courses')->inRandomOrder()->first();
-
         $data = [
             'course' => $course,
-            'grade_level_id' => $gradeLevel->id
+            'grade_level_id' => $this->gradeLevel->id
         ];
         $message = [
             "message" => "The course $course has been successfully updated"
         ];
 
         $response = $this->putJson(
-            "api/courses/$cur->id",
+            "api/courses/" . $this->random->id,
             $data
         );
 
         // test response
         $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
+        // verifica si el dato ha sido guardado en la base de datos
+        $this->assertDatabaseCount("courses", $this->counter);
+        $this->assertDatabaseHas('courses', [
+            'course' => $data["course"],
+        ]);
     }
 
     public function test_can_update_course_with_schedule(): void
@@ -147,13 +198,11 @@ class CourseControllerTest extends TestCase
         $course = $faker->word();
         $day = strtolower($faker->dayOfWeek());
 
-        $gradeLevel = DB::table('grade_level')->inRandomOrder()->first();
         $schedule = DB::table('schedules')->inRandomOrder()->first();
-        $cur = DB::table('courses')->inRandomOrder()->first();
 
         $data = [
             'course' => $course,
-            'grade_level_id' => $gradeLevel->id,
+            'grade_level_id' => $this->gradeLevel->id,
             'schedule_id' => $schedule->id,
             'day' => $day
         ];
@@ -162,12 +211,57 @@ class CourseControllerTest extends TestCase
         ];
 
         $response = $this->putJson(
-            "api/courses/$cur->id",
+            "api/courses/" . $this->random->id,
             $data
         );
 
         // test response
         $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
+        // verifica si el dato ha sido guardado en la base de datos
+        $this->assertDatabaseCount("courses", $this->counter);
+        $this->assertDatabaseHas('courses', [
+            'grade_level_id' => $data["grade_level_id"],
+        ]);
+    }
+
+    public function test_can_soft_destroy_course(): void
+    {
+        $message = [
+            "message" => "the course " . $this->random->course . " has been successfully deleted"
+        ];
+        $response = $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+    }
+
+    public function test_can_restore_course(): void
+    {
+        $message = [
+            "message" => "the course " . $this->random->course . " has been successfully restored"
+        ];
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->postJson(self::BASE_URL . "/restore/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($message);
+    }
+
+    public function test_can_destroy_course(): void
+    {
+        $message = [
+            "message" => "the course " . $this->random->course . " has been successfully deleted permanently"
+        ];
+
+        $this->deleteJson(self::BASE_URL . "/soft_destroy/" . $this->random->id);
+        $response = $this->deleteJson(self::BASE_URL . "/destroy/" . $this->random->id);
+
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+        $this->assertDatabaseCount("courses", $this->counter - 1);
     }
 }

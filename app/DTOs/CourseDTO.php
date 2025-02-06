@@ -41,7 +41,7 @@ class CourseDTO
         }, $collections);
     }
 
-    public static function fromCollection($collections): array
+    public static function fromModelCollection($collections): array
     {
         return array_map(function ($collection) {
             return self::fromBaseModel($collection);
@@ -50,15 +50,11 @@ class CourseDTO
 
     public static function fromModelWithRelation($model): array
     {
-        if ($model->teacher) {
+        if (!is_null($model->teacher)) {
             $teacher = TeacherDTO::fromModel($model->teacher);
-        } else {
-            $teacher = null;
         }
         if (count($model->schedules) > 0) {
             $schedule = ScheduleDTO::fromModelWithRelation($model->schedules[0]);
-        } else {
-            $schedule = null;
         }
 
         $gradeLevel = GradeLevel::find($model->grade_level_id);
@@ -71,22 +67,20 @@ class CourseDTO
             'description' => $model->description,
             'level' => $level,
             'grade' => $grade,
-            'teacher' => $teacher,
-            'schedule' => $schedule
+            'teacher' => $teacher ?? null,
+            'schedule' => $schedule ?? null
         ];
     }
 
-    public static function fromModelTeacherPDf($model): array
+    public static function fromModelTeacherPDf($model)
     {
-        if ($model->teacher) {
+        if (!is_null($model->teacher)) {
             $teacher = TeacherDTO::fromModel($model->teacher);
-        } else {
-            $teacher = null;
         }
 
-        return array_merge(
-            (array)self::fromBaseModel($model),
-            ['teacher' => $teacher]
+        return collect(
+            self::fromBaseModel($model),
+            ['teacher' => $teacher ?? null]
         );
     }
 }

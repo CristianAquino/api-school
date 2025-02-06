@@ -43,8 +43,6 @@ class CourseValidatorMiddleware
             return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // $request->merge(['validated_data' => $validate->validated()]);
-
         return $next($request);
     }
 }
