@@ -75,7 +75,9 @@ class CourseController extends Controller
             ->first();
 
         if (is_null($gradeLevel)) {
-            return response()->json(["message" => "The grade level or grade does not exist"], Response::HTTP_BAD_REQUEST);
+            return response()->json([
+                "message" => "The grade level or grade does not exist"
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $course = new Course($request->only(["course", "description"]));
@@ -84,7 +86,10 @@ class CourseController extends Controller
 
         if (!is_null($request->schedule_id)) {
             if (is_null($request->day)) {
-                return response()->json(["message" => "The day not exist"], Response::HTTP_BAD_REQUEST);
+                return response()->json(
+                    ["message" => "The day not exist"],
+                    Response::HTTP_BAD_REQUEST
+                );
             }
             $schedule = Schedule::where("id", $request->schedule_id)->first();
             $course->schedules()->attach(
@@ -136,7 +141,9 @@ class CourseController extends Controller
                 ->first();
 
             if (is_null($gradeLevel)) {
-                return response()->json(["message" => "The grade level or grade does not exist"], Response::HTTP_BAD_REQUEST);
+                return response()->json([
+                    "message" => "The grade level or grade does not exist"
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $course->update(
@@ -150,7 +157,9 @@ class CourseController extends Controller
 
         if (!is_null($request->schedule_id)) {
             if (is_null($request->day)) {
-                return response()->json(["message" => "The day not exist"], Response::HTTP_BAD_REQUEST);
+                return response()->json([
+                    "message" => "The day not exist"
+                ], Response::HTTP_BAD_REQUEST);
             }
             $schedule = Schedule::where("id", $request->schedule_id)->first();
 

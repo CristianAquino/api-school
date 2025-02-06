@@ -28,7 +28,6 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('softList', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -48,7 +47,6 @@ class ScheduleController extends Controller
         //
         // 'day'=>'required|string|in:' . implode(',', Schedule::DAYS),
         $response = Gate::inspect('store', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -56,8 +54,9 @@ class ScheduleController extends Controller
         }
 
         Schedule::create($request->validated_data);
-
-        return response()->json(["message" => "Schedule created successfully"], Response::HTTP_CREATED);
+        return response()->json([
+            "message" => "Schedule created successfully"
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -67,15 +66,13 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('view', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $courses = $schedule->courses;
-        $scheduleDTO = ScheduleDTO::fromCollectionWithRelation($schedule, $courses);
+        $scheduleDTO = ScheduleDTO::fromCollectionWithRelation($schedule);
         return response()->json($scheduleDTO, Response::HTTP_OK);
     }
 
@@ -86,7 +83,6 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('update', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -94,8 +90,9 @@ class ScheduleController extends Controller
         }
 
         $schedule->update($request->validated_data);
-
-        return response()->json(["message" => "Schedule has been successfully updated"], Response::HTTP_ACCEPTED);
+        return response()->json([
+            "message" => "Schedule has been successfully updated"
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -105,7 +102,6 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -125,7 +121,6 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('restore', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -153,7 +148,6 @@ class ScheduleController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Schedule::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()

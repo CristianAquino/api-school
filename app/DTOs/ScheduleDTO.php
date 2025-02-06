@@ -47,32 +47,37 @@ class ScheduleDTO
         }, $collections->all());
     }
 
-    public static function fromModelWithRelation($model): self
+    public static function fromModelWithRelation($model): array
     {
         $day = $model->pivot->day;
-        return new self(
-            $model->id,
-            $model->start_time,
-            $model->end_time,
-            $day
-        );
+        // return new self(
+        //     $model->id,
+        //     $model->start_time,
+        //     $model->end_time,
+        //     $day
+        // );
+        return [
+            "id" => $model->id,
+            "start_time" => $model->start_time,
+            "end_time" => $model->end_time,
+            "day" => $day
+        ];
     }
 
-    public static function fromCollectionWithRelation($model, $collections): array
+    public static function fromCollectionWithRelation($model): array
     {
+        $collections = $model->courses;
         $courses =  array_map(function ($collection) {
             $course = CourseDTO::fromBaseModel($collection);
-            if ($collection->teacher) {
+            if (!is_null($collection->teacher)) {
                 $teacher = TeacherDTO::fromModel($collection->teacher);
-            } else {
-                $teacher = null;
             }
             $day = $collection->pivot->day;
 
-            return array_merge(
-                (array)$course,
+            return collect(
+                $course,
                 ["day" => $day],
-                ["teacher" => $teacher]
+                ["teacher" => $teacher ?? null]
             );
         }, $collections->all());
 
