@@ -50,12 +50,6 @@ class ScheduleDTO
     public static function fromModelWithRelation($model): array
     {
         $day = $model->pivot->day;
-        // return new self(
-        //     $model->id,
-        //     $model->start_time,
-        //     $model->end_time,
-        //     $day
-        // );
         return [
             "id" => $model->id,
             "start_time" => $model->start_time,
@@ -74,8 +68,8 @@ class ScheduleDTO
             }
             $day = $collection->pivot->day;
 
-            return collect(
-                $course,
+            return array_merge(
+                (array)$course,
                 ["day" => $day],
                 ["teacher" => $teacher ?? null]
             );

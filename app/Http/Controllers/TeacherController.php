@@ -40,7 +40,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('softList', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -67,7 +66,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('store', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -140,7 +138,6 @@ class TeacherController extends Controller
     public function assignCourse(Teacher $teacher, Course $course)
     {
         $response = Gate::inspect('assign', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -162,7 +159,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('update', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -195,7 +191,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -215,7 +210,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('restore', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -226,7 +220,7 @@ class TeacherController extends Controller
 
         if (is_null($teacher)) {
             return response()->json([
-                "message" => "the academic year does not exist"
+                "message" => "the teacher does not exist"
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -243,7 +237,6 @@ class TeacherController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Teacher::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -258,12 +251,10 @@ class TeacherController extends Controller
         }
 
         $code = $teacher->user->code;
-
-        foreach ($teacher->courses as $course) {
-            $course->teacher_id = null;
-            $course->save();
-        }
-
+        // foreach ($teacher->courses as $course) {
+        //     $course->teacher_id = null;
+        //     $course->save();
+        // }
         $teacher->forceDelete();
         User::where('userable_id', $teacher->id)->delete();
         return response()->json([

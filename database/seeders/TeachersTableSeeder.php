@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Teacher;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
-use Illuminate\Support\Facades\Hash;
 
 
 class TeachersTableSeeder extends Seeder

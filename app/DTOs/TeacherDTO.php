@@ -17,14 +17,7 @@ class TeacherDTO
 
     public static function fromModel($model): array
     {
-        $user = UserDTO::fromBaseModel($model->user);
-        return [
-            'id' => $model->id,
-            'names' => $user->name,
-            'first_name' => $user->first_name,
-            'second_name' => $user->second_name,
-            'code' => $user->code
-        ];
+        return UserDTO::fromPartialModel($model);
     }
 
     public static function fromPagination($model): array
@@ -42,29 +35,23 @@ class TeacherDTO
         }, $collections);
     }
 
-    // public static function fromCollection($collections): array
-    // {
-    //     return array_map(function ($collection) {
-    //         return self::fromModel($collection);
-    //     }, $collections->all());
-    // }
-
-    public static function fromModelWithRelation($model): array
+    public static function fromModelWithRelation($model)
     {
         $user = UserDTO::fromBaseModel($model->user);
         $courses = [];
 
         foreach ($model->courses as $course) {
             $sch = ScheduleDTO::fromModelWithRelation($course->schedules[0]);
-            $co = (array)CourseDTO::fromBaseModel($course);
+            $co = collect(CourseDTO::fromBaseModel($course));
             $gl = GradeLevel::where('id', $course->grade_level_id)
                 ->first();
 
-            $co['grade'] = $gl->grade->grade;
             $co['level'] = $gl->level->level;
+            $co['grade'] = $gl->grade->grade;
             $co['schedule'] = $sch;
             $courses[] = $co;
         }
+
         return array_merge(
             ['id' => $model->id],
             (array)$user,

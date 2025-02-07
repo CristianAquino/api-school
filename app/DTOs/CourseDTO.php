@@ -78,8 +78,8 @@ class CourseDTO
             $teacher = TeacherDTO::fromModel($model->teacher);
         }
 
-        return collect(
-            self::fromBaseModel($model),
+        return array_merge(
+            (array)self::fromBaseModel($model),
             ['teacher' => $teacher ?? null]
         );
     }

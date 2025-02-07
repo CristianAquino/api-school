@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\AuthenticateWithCookie;
+use App\Http\Middleware\JWTMiddleware;
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Faker\Factory as Faker;
@@ -15,31 +18,88 @@ class TeacherControllerTest extends TestCase
      * A basic feature test example.
      */
     use RefreshDatabase;
+    private const BASE_URL = '/api/teachers';
+    protected Teacher $teacher;
+    protected int $teacher_total;
+    protected User $user;
+
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware([
+            AuthenticateWithCookie::class,
+            JWTMiddleware::class
+        ]);
+
+        $this->postJson('/api/login', [
+            "code" => "AD20250000",
+            "password" => "12345678"
+        ]);
+
+        // random data
+        $query = Teacher::query();
+        $this->teacher = $query->inRandomOrder()->first();
+        $this->teacher_total = $query->count();
+        $this->user = $this->teacher->user;
+    }
 
     public function test_can_list_teachers(): void
     {
-        $response = $this->getJson('/api/teachers');
-
+        $response = $this->getJson(self::BASE_URL);
         // test response
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonIsArray();
+        $this->assertDatabaseCount("teachers", $this->teacher_total);
         $response->assertExactJsonStructure(
             [
-                '*' => [
-                    'id',
-                    'names',
-                    'first_name',
-                    'second_name',
-                ]
+                'data' => [
+                    '*' => [
+                        'id',
+                        'names',
+                        'first_name',
+                        'second_name',
+                        'code'
+                    ]
+                ],
+                'pagination',
+            ]
+        );
+    }
+
+    public function test_can_view_soft_list_teachers(): void
+    {
+        $this->deleteJson(
+            self::BASE_URL . "/soft_destroy/" . $this->teacher->id
+        );
+
+        $response = $this
+            ->getJson(self::BASE_URL . "/soft_list");
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertExactJsonStructure(
+            [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'names',
+                        'first_name',
+                        'second_name',
+                        'code'
+                    ]
+                ],
+                'pagination',
             ]
         );
     }
 
     public function test_can_create_teacher(): void
     {
-        $teacher = DB::table('teachers')->latest("id")->first();
-        $c = DB::table('users')->where('userable_id', $teacher->id)->first()->code;
-        $i = (int)substr($c, 2) + 1;
+        $cod = User::where('userable_type', Teacher::class)
+            ->latest("id")
+            ->first()
+            ->code;
+        $i = (int)substr($cod, 2) + 1;
         $code = 'TE' . $i;
 
         $faker = Faker::create();
@@ -57,20 +117,49 @@ class TeacherControllerTest extends TestCase
             "message" => "teacher " . $data["first_name"] . " " . $data["second_name"] . " " . $data["name"] . " has been added successfully with code $code"
         ];
 
-        $response = $this->postJson('/api/teachers', $data);
-
+        $response = $this->postJson(self::BASE_URL, $data);
         // test response
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($message);
         $this->assertDatabaseHas('users', ["email" => $data["email"]]);
+        $this->assertDatabaseCount("teachers", $this->teacher_total + 1);
+    }
+
+    public function test_can_view_me_information(): void
+    {
+        $auth = $this->postJson('/api/login', [
+            "code" => $this->user->code,
+            "password" => $this->user->code . $this->user->dni
+        ]);
+        $token = $auth["token"];
+
+        $response = $this
+            ->withHeader("authorization", "Bearer  $token")
+            ->getJson(self::BASE_URL . "/me");
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertExactJsonStructure(
+            [
+                'id',
+                'name',
+                'first_name',
+                'second_name',
+                'phone',
+                'birth_date',
+                'address',
+                'email',
+                'dni',
+                'code',
+                'courses'
+            ]
+        );
     }
 
     public function test_can_show_teacher(): void
     {
-        // random data
-        $query = DB::table('teachers')->inRandomOrder()->first();
-        $response = $this->getJson("/api/teachers/$query->id");
-
+        $response = $this->getJson(
+            self::BASE_URL . "/" . $this->teacher->id
+        );
         // test response
         $response->assertStatus(Response::HTTP_OK);
         $response->assertExactJsonStructure(
@@ -92,19 +181,22 @@ class TeacherControllerTest extends TestCase
 
     public function test_assign_course_teacher(): void
     {
-        $teacher = DB::table('teachers')->inRandomOrder()->first();
-        $user = DB::table('users')->where('userable_id', $teacher->id)->first();
         $course = DB::table('courses')->inRandomOrder()->first();
 
         $message = [
-            "message" => "Professor " . $user->first_name . " " . $user->second_name . " has been successfully assigned course $course->course"
+            "message" => "Professor " . $this->user->first_name . " " . $this->user->second_name . " has been successfully assigned course $course->course"
         ];
 
-        $response = $this->postJson("/api/teachers/$teacher->id/courses/$course->id");
-
+        $response = $this->postJson(
+            self::BASE_URL . "/" . $this->teacher->id . "/courses/$course->id"
+        );
         // test response
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJson($message);
+        $this->assertDatabaseHas('courses', [
+            "id" => $course->id,
+            "teacher_id" => $this->teacher->id
+        ]);
     }
 
     public function test_can_update_teacher(): void
@@ -120,28 +212,77 @@ class TeacherControllerTest extends TestCase
             'dni' => (string)$faker->randomNumber(8, true),
             'email' => $faker->email(),
         ];
-
-        // radom data
-        $teacher = DB::table('teachers')->inRandomOrder()->first();
-        $code = DB::table('users')->where('userable_id', $teacher->id)->first()->code;
-
         $message = [
-            "message" => "The teacher with code $code has been successfully updated"
+            "message" => "The teacher with code " . $this->user->code . " has been successfully updated"
         ];
 
-        $response = $this->putJson("/api/teachers/$teacher->id", $data);
+        $response = $this->putJson(
+            self::BASE_URL . "/" . $this->teacher->id,
+            $data
+        );
         // test response
         $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertJson($message);
         // verifica si el dato existe en la base de datos
         $this->assertDatabaseHas('teachers', [
-            'id' => $teacher->id,
+            'id' => $this->teacher->id,
         ]);
         // verifica si el dato ha sido guardado en la base de datos
         $this->assertDatabaseHas('users', [
             'email' => $data["email"],
-            'code' => $code,
-            'userable_id' => $teacher->id,
+            'code' => $this->user->code,
+            'userable_id' => $this->teacher->id,
         ]);
+    }
+
+    public function test_can_soft_destroy_teacher(): void
+    {
+        $message = [
+            "message" => "the teacher with code " . $this->user->code . " has been successfully deleted"
+        ];
+
+        $response = $this->deleteJson(
+            self::BASE_URL . "/soft_destroy/" . $this->teacher->id
+        );
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+    }
+
+    public function test_can_restore_teacher(): void
+    {
+        $message = [
+            "message" => "the teacher with code " . $this->user->code . " has been successfully restored"
+        ];
+
+        $this->deleteJson(
+            self::BASE_URL . "/soft_destroy/" . $this->teacher->id
+        );
+
+        $response = $this->postJson(
+            self::BASE_URL . "/restore/" . $this->teacher->id
+        );
+        // test response
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($message);
+    }
+
+    public function test_can_destroy_teacher(): void
+    {
+        $message = [
+            "message" => "the teacher with code " . $this->user->code . " has been successfully deleted permanently"
+        ];
+
+        $this->deleteJson(
+            self::BASE_URL . "/soft_destroy/" . $this->teacher->id
+        );
+
+        $response = $this->deleteJson(
+            self::BASE_URL . "/destroy/" . $this->teacher->id
+        );
+        // test response
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertJson($message);
+        $this->assertDatabaseCount("teachers", $this->teacher_total - 1);
     }
 }
