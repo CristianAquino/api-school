@@ -71,16 +71,4 @@ class CourseDTO
             'schedule' => $schedule ?? null
         ];
     }
-
-    public static function fromModelTeacherPDf($model)
-    {
-        if (!is_null($model->teacher)) {
-            $teacher = TeacherDTO::fromModel($model->teacher);
-        }
-
-        return array_merge(
-            (array)self::fromBaseModel($model),
-            ['teacher' => $teacher ?? null]
-        );
-    }
 }

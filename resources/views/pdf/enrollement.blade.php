@@ -11,7 +11,7 @@
 <body>
     <p class="invalid">copia sin valor oficial</p>
     <header class="header">
-        <h6>code enrollement: {{$student["id"]}}</h6>
+        <h6>code enrollement: {{$enrollement["id"]}}</h6>
     </header>
     <main class="main">
             <table class="table_head">
@@ -28,31 +28,31 @@
         <table class="table">
             <tr>
                 <th>first name:</th>
-                <td>{{$student["first_name"]}}</td>
+                <td>{{$enrollement["first_name"]}}</td>
             </tr>
             <tr>
                 <th>second name:</th>
-                <td>{{$student["second_name"]}}</td>
+                <td>{{$enrollement["second_name"]}}</td>
             </tr>
             <tr>
                 <th>names:</th>
-                <td>{{$student["names"]}}</td>
+                <td>{{$enrollement["names"]}}</td>
             </tr>
             <tr>
                 <th>level:</th>
-                <td>{{$student["level"]}}</td>
+                <td>{{$enrollement["level"]}}</td>
             </tr>
             <tr>
                 <th>grade:</th>
-                <td>{{$student["grade"]}}</td>
+                <td>{{$enrollement["grade"]}}</td>
             </tr>
             <tr>
                 <th>academic year:</th>
-                <td>{{$student["academic_year"]}}</td>
+                <td>{{$enrollement["academic_year"]}}</td>
             </tr>
             <tr>
                 <th>code student:</th>
-                <td>{{$student["code"]}}</td>
+                <td>{{$enrollement["code"]}}</td>
             </tr>
         </table>
         <div>
@@ -65,7 +65,7 @@
                     <th>Teacher</td>
 
                 </tr>
-                @foreach ($student["courses"] as $item)
+                @foreach ($enrollement["courses"] as $item)
                     <tr>
                         <td style="text-align: center">{{$loop->index +1}}</th>
                         <td>{{$item["course"]}}</td>
@@ -77,7 +77,7 @@
         </div>
     </main>
     <footer class="footer">
-        <h6>code enrollement: {{$student["id"]}}</h6>
+        <h6>code enrollement: {{$enrollement["id"]}}</h6>
     </footer>
 </body>
 </html>

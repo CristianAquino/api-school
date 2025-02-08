@@ -8,7 +8,6 @@ use App\Models\Level;
 use App\Models\Student;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
-use Illuminate\Support\Facades\Hash;
 
 class EnrollementsTableSeeder extends Seeder
 {

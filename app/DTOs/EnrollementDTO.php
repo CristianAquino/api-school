@@ -2,39 +2,61 @@
 
 namespace App\DTOs;
 
+use App\Models\GradeLevel;
+
 class EnrollementDTO
 {
     /**
      * Create a new class instance.
      */
-    public function __construct(
-        public readonly string $id,
-        public readonly string $academic_year,
-        public readonly string $grade,
-        public readonly string $level,
-        public readonly StudentDTO|array $student,
-    ) {
+    public function __construct()
+    {
         //
     }
 
-    public static function fromModel($model): self
+    public static function fromBaseModel($model): array
     {
-        // dd($model->student);
-        // return [
-        //     'id' => $model->id,
-        //     'academic_year' => $model->academic_year->year,
-        //     'grade' => $model->gradeLevel->grade->grade,
-        //     'level' => $model->gradeLevel->level->level,
-        //     'student' => TeacherDTO::fromModel($model->student),
-        // ];
-        $student = TeacherDTO::fromModel($model->student);
-        return new self(
-            $model->id,
-            $model->academic_year->year,
-            $model->gradeLevel->grade->grade,
-            $model->gradeLevel->level->level,
-            $student
-        );
+        $user = UserDTO::fromBaseModel($model->student->user);
+        $query = GradeLevel::find($model->grade_level_id);
+        $grade = $query->grade->grade;
+        $level = $query->level->level;
+        $courses = [];
+
+        foreach ($query->courses as $course) {
+            if (!is_null($course->teacher)) {
+                $teacher = TeacherDTO::fromModel($course->teacher);
+            }
+            $cour = CourseDTO::fromBaseModel($course);
+            $courses[] = array_merge(
+                (array)$cour,
+                ["teacher" => $teacher ?? null]
+            );
+        }
+
+        return [
+            'id' => $model->id,
+            'names' => $user->name,
+            'first_name' => $user->first_name,
+            'second_name' => $user->second_name,
+            'academic_year' => $model->academic_year->year,
+            'level' => $level,
+            'grade' => $grade,
+            'code' => $user->code,
+            'courses' => $courses
+        ];
+    }
+
+    public static function fromPartialModel($model): array
+    {
+        $student = UserDTO::fromPartialModel($model->student);
+
+        return [
+            "id" => $model->id,
+            "academic_year" => $model->academic_year->year,
+            "grade" => $model->gradeLevel->grade->grade,
+            "level" => $model->gradeLevel->level->level,
+            "student" => $student
+        ];
     }
 
     public static function fromPagination($model): array
@@ -48,25 +70,14 @@ class EnrollementDTO
     public static function fromPaginationCollection($collections): array
     {
         return array_map(function ($collection) {
-            return self::fromModel($collection);
+            return self::fromPartialModel($collection);
         }, $collections);
     }
 
     public static function fromCollection($collections): array
     {
         return array_map(function ($collection) {
-            return self::fromModel($collection);
+            return self::fromBaseModel($collection);
         }, $collections->all());
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'academic_year' => $this->academic_year,
-            'student' => $this->student,
-            'grade' => $this->grade,
-            'level' => $this->level
-        ];
     }
 }

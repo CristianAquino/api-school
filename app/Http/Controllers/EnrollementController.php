@@ -9,8 +9,10 @@ use App\Models\GradeLevel;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EnrollementController extends Controller
 {
@@ -33,14 +35,14 @@ class EnrollementController extends Controller
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('gradeLevel', function ($query) use ($level) {
                     $query->whereHas('level', function ($query) use ($level) {
-                        $query->whereRaw('Lower(level) like ?', "%$level%");
+                        $query->whereRaw('LOWER(level) LIKE ?', "%$level%");
                     });
                 });
             })
             ->when($code, function ($query) use ($code) {
                 $query->whereHas('student', function ($query) use ($code) {
                     $query->whereHas('user', function ($query) use ($code) {
-                        $query->whereRaw('Lower(code) like ?', "%$code%");
+                        $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
                     });
                 });
             })
@@ -57,7 +59,6 @@ class EnrollementController extends Controller
     {
         //
         $response = Gate::inspect('softList', Enrollement::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -77,14 +78,14 @@ class EnrollementController extends Controller
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('gradeLevel', function ($query) use ($level) {
                     $query->whereHas('level', function ($query) use ($level) {
-                        $query->whereRaw('Lower(level) like ?', "%$level%");
+                        $query->whereRaw('LOWER(level) LIKE ?', "%$level%");
                     });
                 });
             })
             ->when($code, function ($query) use ($code) {
                 $query->whereHas('student', function ($query) use ($code) {
                     $query->whereHas('user', function ($query) use ($code) {
-                        $query->whereRaw('Lower(code) like ?', "%$code%");
+                        $query->whereRaw('LOWER(code) LIKE ?', "%$code%");
                     });
                 });
             })
@@ -97,11 +98,13 @@ class EnrollementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, AcademicYear $academicYear, GradeLevel $gradeLevel)
-    {
+    public function newEnrollement(
+        Request $request,
+        AcademicYear $academicYear,
+        GradeLevel $gradeLevel
+    ) {
         //
         $response = Gate::inspect('store', Enrollement::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -147,8 +150,50 @@ class EnrollementController extends Controller
             "message" => "The registration for student $request->first_name $request->second_name $request->name has been created successfully"
         ], Response::HTTP_CREATED);
     }
-    // imprimir el historial de matricula de un estudiante,
-    // esto incluira todas las matriculas, notas, etc para cada estudiante
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function currentEnrollement(
+        AcademicYear $academicYear,
+        GradeLevel $gradeLevel,
+        Student $student
+    ) {
+        //
+        $response = Gate::inspect('store', Enrollement::class);
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $enrolle = Enrollement::where('student_id', $student->id)
+            ->latest('id')
+            ->first();
+
+        if ($enrolle->academic_year->year >= $academicYear->year) {
+            return response()->json([
+                "message" => "The student is already enrolled for the current academic year $academicYear->year"
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if ($enrolle->gradeLevel->level == $gradeLevel->level) {
+            if ($enrolle->gradeLevel->grade >= $gradeLevel->grade) {
+                return response()->json([
+                    "message" => "The student is already enrolled for the current grade level " . $gradeLevel->level->level
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        $enrollement = new Enrollement();
+        $enrollement->student_id = $student->id;
+        $enrollement->academic_year_id = $academicYear->id;
+        $enrollement->grade_level_id = $gradeLevel->id;
+        $enrollement->save();
+
+        return response()->json([
+            "message" => "The registration for student " . $student->user->first_name . " " . $student->user->second_name . " " . $student->user->name . " has been created successfully"
+        ], Response::HTTP_CREATED);
+    }
 
     /**
      * Display the specified resource.
@@ -156,8 +201,36 @@ class EnrollementController extends Controller
     public function show(Enrollement $enrollement)
     {
         //
-        $enrollementDTO = EnrollementDTO::fromModel($enrollement);
+        $response = Gate::inspect('view', Enrollement::class);
+        if (!$response->allowed()) {
+            return response()->json([
+                "message" => $response->message()
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $enrollementDTO = EnrollementDTO::fromBaseModel($enrollement);
         return response()->json($enrollementDTO, Response::HTTP_OK);
+    }
+
+    /**
+     * Print the specified resource.
+     */
+    public function printEnrollement()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $enrollement = Enrollement::where("student_id", $user->id)->latest("id")->first();
+
+        $enrollementDTO = EnrollementDTO::fromBaseModel($enrollement);
+        $pdf = PDF::loadView('pdf.enrollement', ['enrollement' => $enrollementDTO]);
+        return $pdf->download('enrollement.pdf');
     }
 
     /**
@@ -175,7 +248,6 @@ class EnrollementController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Enrollement::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -195,7 +267,6 @@ class EnrollementController extends Controller
     {
         //
         $response = Gate::inspect('restore', Enrollement::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -223,7 +294,6 @@ class EnrollementController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Enrollement::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -238,10 +308,10 @@ class EnrollementController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $enrollement->academic_year_id = null;
-        $enrollement->grade_level_id = null;
-        $enrollement->student_id = null;
-        $enrollement->save();
+        // $enrollement->academic_year_id = null;
+        // $enrollement->grade_level_id = null;
+        // $enrollement->student_id = null;
+        // $enrollement->save();
 
         $enrollement->forceDelete();
         return response()->json([
