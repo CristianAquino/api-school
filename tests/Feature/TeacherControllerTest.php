@@ -73,8 +73,7 @@ class TeacherControllerTest extends TestCase
             self::BASE_URL . "/soft_destroy/" . $this->teacher->id
         );
 
-        $response = $this
-            ->getJson(self::BASE_URL . "/soft_list");
+        $response = $this->getJson(self::BASE_URL . "/soft_list");
         // test response
         $response->assertStatus(Response::HTTP_OK);
         $response->assertExactJsonStructure(
@@ -125,7 +124,7 @@ class TeacherControllerTest extends TestCase
         $this->assertDatabaseCount("teachers", $this->teacher_total + 1);
     }
 
-    public function test_can_view_me_information(): void
+    public function test_can_view_me_teacher_information(): void
     {
         $auth = $this->postJson('/api/login', [
             "code" => $this->user->code,

@@ -16,15 +16,7 @@ class StudentDTO
 
     public static function fromModel($model): array
     {
-        $user = UserDTO::fromBaseModel($model->user);
-
-        return [
-            'id' => $model->id,
-            'names' => $user->name,
-            'first_name' => $user->first_name,
-            'second_name' => $user->second_name,
-            'code' => $user->code
-        ];
+        return UserDTO::fromPartialModel($model);
     }
 
     public static function fromPagination($model): array
@@ -42,27 +34,23 @@ class StudentDTO
         }, $collections);
     }
 
-    // public static function fromCollection($collections): array
-    // {
-    //     return array_map(function ($collection) {
-    //         return self::fromModel($collection);
-    //     }, $collections->all());
-    // }
-
     public static function fromModelWithRelation($model): array
     {
-        $user = UserDTO::fromBaseModel($model->user);
-        $lastEnrollement = $model->enrollements()->latest("academic_year_id")->first();
-        $dl = $lastEnrollement->grade_level_id;
-        $query = GradeLevel::find($dl);
+        $user = UserDTO::fromBaseModel($model->student->user);
+        $query = GradeLevel::find($model->grade_level_id);
         $grade = $query->grade->grade;
         $level = $query->level->level;
-        $cs = $query->courses;
         $courses = [];
 
-        foreach ($cs as $course) {
-            $co = CourseDTO::fromBaseModel($course);
-            $courses[] = $co;
+        foreach ($query->courses as $course) {
+            if (!is_null($course->teacher)) {
+                $teacher = TeacherDTO::fromModel($course->teacher);
+            }
+            $cour = CourseDTO::fromBaseModel($course);
+            $courses[] = array_merge(
+                (array)$cour,
+                ["teacher" => $teacher ?? null]
+            );
         }
 
         return [
@@ -70,40 +58,15 @@ class StudentDTO
             'names' => $user->name,
             'first_name' => $user->first_name,
             'second_name' => $user->second_name,
-            'academic_year' => $lastEnrollement->academic_year->year,
+            'phone' => $user->phone,
+            'birth_date' => $user->birth_date,
+            'address' => $user->address,
+            'email' => $user->email,
+            'dni' => $user->dni,
+            'code' => $user->code,
+            'academic_year' => $model->academic_year->year,
             'level' => $level,
             'grade' => $grade,
-            'code' => $user->code,
-            'courses' => $courses
-        ];
-    }
-
-
-    public static function fromPDFModel($model): array
-    {
-        $user = UserDTO::fromBaseModel($model->user);
-        $lastEnrollement = $model->enrollements()->latest("academic_year_id")->first();
-        $dl = $lastEnrollement->grade_level_id;
-        $query = GradeLevel::find($dl);
-        $grade = $query->grade->grade;
-        $level = $query->level->level;
-        $cs = $query->courses;
-        $courses = [];
-
-        foreach ($cs as $course) {
-            $co = CourseDTO::fromModelTeacherPDf($course);
-            $courses[] = $co;
-        }
-
-        return [
-            'id' => $model->id,
-            'names' => $user->name,
-            'first_name' => $user->first_name,
-            'second_name' => $user->second_name,
-            'academic_year' => $lastEnrollement->academic_year->year,
-            'level' => $level,
-            'grade' => $grade,
-            'code' => $user->code,
             'courses' => $courses
         ];
     }

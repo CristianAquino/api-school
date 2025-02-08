@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\StudentDTO;
+use App\Models\Enrollement;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -40,7 +41,6 @@ class StudentController extends Controller
     {
         //
         $response = Gate::inspect('softList', Student::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -76,35 +76,16 @@ class StudentController extends Controller
         //
         $me = Auth::user()->userable_id;
         $user = Student::where('id', $me)->first();
-
-        // if (is_null($user)) {
-        //     return response()->json([
-        //         "message" => "You do not have the role allowed to perform this action"
-        //     ], Response::HTTP_NOT_FOUND);
-        // }
-
-        $studentDTO = StudentDTO::fromModelWithRelation($user);
-        return response()->json($studentDTO, Response::HTTP_OK);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function pdf()
-    {
-        //
-        $me = Auth::user()->userable_id;
-        $user = Student::where('id', $me)->first();
-
         if (is_null($user)) {
             return response()->json([
                 "message" => "You do not have the role allowed to perform this action"
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $studentDTO = StudentDTO::fromPDFModel($user);
-        $pdf = PDF::loadView('pdf.student', ['student' => $studentDTO]);
-        return $pdf->download('enrollement.pdf');
+        $enrolle = Enrollement::where("student_id", $user->id)->latest("id")->first();
+
+        $studentDTO = StudentDTO::fromModelWithRelation($enrolle);
+        return response()->json($studentDTO, Response::HTTP_OK);
     }
 
     /**
@@ -113,17 +94,16 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         //
-        $response = Gate::inspect('view', $student);
-
+        $response = Gate::inspect('view', Student::class);
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
             ], Response::HTTP_FORBIDDEN);
         }
-        // $studentsDTO = $student->enrollements()->latest("academic_year_id")->first(); //->where("academic_year_id", $a->id)->first();
-        // $a = $studentsDTO->grade_level_id;
-        // $g = GradeLevel::find($a)->courses[0]->schedules;
-        $studentDTO = StudentDTO::fromModelWithRelation($student);
+
+        $enrolle = Enrollement::where("student_id", $student->id)->latest("id")->first();
+
+        $studentDTO = StudentDTO::fromModelWithRelation($enrolle);
         return response()->json($studentDTO, Response::HTTP_OK);
     }
 
@@ -134,7 +114,6 @@ class StudentController extends Controller
     {
         //
         $response = Gate::inspect('update', Student::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -153,7 +132,6 @@ class StudentController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Student::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -162,7 +140,7 @@ class StudentController extends Controller
 
         $student->delete();
         return response()->json([
-            "message" => "the student " . $student->first_name . " " . $student->second_name . " " . $student->name . " has been successfully deleted"
+            "message" => "the student " . $student->user->first_name . " " . $student->user->second_name . " " . $student->user->name . " has been successfully deleted"
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -173,7 +151,6 @@ class StudentController extends Controller
     {
         //
         $response = Gate::inspect('restore', Student::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -190,7 +167,7 @@ class StudentController extends Controller
 
         $student->restore();
         return response()->json([
-            "message" => "the student " . $student->first_name . " " . $student->second_name . " " . $student->name . " has been successfully restored"
+            "message" => "the student " . $student->user->first_name . " " . $student->user->second_name . " " . $student->user->name . " has been successfully restored"
         ], Response::HTTP_OK);
     }
 
@@ -201,7 +178,6 @@ class StudentController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Student::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -214,11 +190,12 @@ class StudentController extends Controller
                 "message" => "the student does not exist"
             ], Response::HTTP_BAD_REQUEST);
         }
+        $code = $student->user->code;
 
         $student->forceDelete();
         User::where('userable_id', $student->id)->delete();
         return response()->json([
-            "message" => "the student " . $student->first_name . " " . $student->second_name . " " . $student->name . " has been successfully deleted permanently"
+            "message" => "the student with code $code has been successfully deleted permanently"
         ], Response::HTTP_ACCEPTED);
     }
 }
