@@ -5,13 +5,11 @@ namespace Tests\Feature;
 use App\Http\Middleware\AuthenticateWithCookie;
 use App\Http\Middleware\JWTMiddleware;
 use App\Models\Admin;
-use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Faker\Factory as Faker;
-use Illuminate\Support\Facades\DB;
 
 class AdminControllerTest extends TestCase
 {

@@ -14,7 +14,7 @@ class GeneralPolicy
     public function view(User $user): Response
     {
         $admin = $user->userable;
-        return $user->isGranted(User::ROLE_SUPERADMIN, $admin->role)
+        return $user->isGranted(User::ROLE_ADMIN, $admin->role)
             ? Response::allow()
             : Response::deny("You do not have the role allowed to perform this action");
     }
@@ -25,7 +25,7 @@ class GeneralPolicy
     public function assign(User $user): Response
     {
         $admin = $user->userable;
-        return $user->isGranted(User::ROLE_SUPERADMIN, $admin->role)
+        return $user->isGranted(User::ROLE_ADMIN, $admin->role)
             ? Response::allow()
             : Response::deny("You do not have the role allowed to perform this action");
     }

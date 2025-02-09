@@ -2,9 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Course;
 use App\Models\Qualification;
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 

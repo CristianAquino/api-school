@@ -41,14 +41,20 @@ class QualificationController extends Controller
         $cou = Course::where('id', $course->id)->first();
 
         if (is_null($enrollement) && is_null($cou)) {
-            return response()->json(["message" => "The student or course not found"], Response::HTTP_FORBIDDEN);
+            return response()->json([
+                "message" => "The student or course not found"
+            ], Response::HTTP_FORBIDDEN);
         } elseif ($enrollement->grade_level_id != $cou->grade_level_id) {
-            return response()->json(["message" => "The student is not enrolled in the course"], Response::HTTP_FORBIDDEN);
+            return response()->json([
+                "message" => "The student is not enrolled in the course"
+            ], Response::HTTP_FORBIDDEN);
         } else {
             $me = Auth::user()->userable_id;
             $user = Teacher::where('id', $me)->first();
             if ($cou->teacher_id != $user->id) {
-                return response()->json(["message" => "The professor does not teach this course"], Response::HTTP_FORBIDDEN);
+                return response()->json([
+                    "message" => "The professor does not teach this course"
+                ], Response::HTTP_FORBIDDEN);
             }
         }
 
@@ -59,7 +65,9 @@ class QualificationController extends Controller
             ->count();
 
         if ($a > $prom - 1) {
-            return response()->json(["message" => "The student already has a qualification in this course"], Response::HTTP_FORBIDDEN);
+            return response()->json([
+                "message" => "The student already has a qualification in this course"
+            ], Response::HTTP_FORBIDDEN);
         }
 
         $new_datos = $request->validated_data;
@@ -87,7 +95,9 @@ class QualificationController extends Controller
         $qualification->course_id = $course->id;
         $qualification->save();
 
-        return response()->json(["message" => "Qualification $request->number_note has been successfully recorded for student $student->code in course $course->course"], Response::HTTP_CREATED);
+        return response()->json([
+            "message" => "Qualification $request->number_note has been successfully recorded for student $student->code in course $course->course"
+        ], Response::HTTP_CREATED);
     }
 
     /**

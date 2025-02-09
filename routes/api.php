@@ -24,9 +24,6 @@ use App\Http\Middleware\UserValidatorMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login'])->middleware(LoginValidatorMiddleware::class);
-Route::get('me', [AuthController::class, 'me']);
-
-
 
 Route::middleware([
     AuthenticateWithCookie::class,
@@ -69,7 +66,6 @@ Route::middleware([
         'academic_years/destroy/{academicYear}',
         [AcademicYearController::class, 'destroy']
     );
-
     // routes for levels
     Route::get(
         'levels',
@@ -103,7 +99,6 @@ Route::middleware([
         'levels/destroy/{level}',
         [LevelController::class, 'destroy']
     );
-
     // routes for grades
     Route::get(
         'grades',
@@ -141,7 +136,6 @@ Route::middleware([
         'levels/{level}/grades/{grade}',
         [GradeController::class, 'show']
     );
-
     // routes for courses
     Route::get(
         'courses',
@@ -175,7 +169,6 @@ Route::middleware([
         'levels/{level}/grades/{grade}/courses',
         [CourseController::class, 'store']
     )->middleware(CourseValidatorMiddleware::class);
-
     // routes for schedules
     Route::get(
         'schedules',
@@ -209,7 +202,6 @@ Route::middleware([
         'schedules/destroy/{schedule}',
         [ScheduleController::class, 'destroy']
     );
-
     // routes for teachers
     Route::get(
         'teachers',
@@ -251,7 +243,6 @@ Route::middleware([
         'teachers/{teacher}/courses/{course}',
         [TeacherController::class, 'assignCourse']
     );
-
     // routes for enrollements
     Route::get(
         'enrollements',
@@ -260,6 +251,10 @@ Route::middleware([
     Route::get(
         'enrollements/soft_list',
         [EnrollementController::class, 'softList']
+    );
+    Route::get(
+        'enrollements/print',
+        [EnrollementController::class, 'printEnrollement']
     );
     Route::get(
         'enrollements/{enrollement}',
@@ -279,16 +274,17 @@ Route::middleware([
     );
     Route::post(
         'enrollements/academic_years/{academicYear}/grade_level/{gradeLevel}',
-        [EnrollementController::class, 'store']
+        [EnrollementController::class, 'newEnrollement']
     )->middleware(UserValidatorMiddleware::class);
-
+    Route::post(
+        'enrollements/academic_years/{academicYear}/grade_level/{gradeLevel}/student/{student}',
+        [EnrollementController::class, 'currentEnrollement']
+    );
     // routes for students
     Route::get(
         'students',
         [StudentController::class, 'index']
     );
-    // pdf
-    Route::get('students/pdf', [StudentController::class, 'pdf']);
     Route::get(
         'students/me',
         [StudentController::class, 'me']
@@ -317,7 +313,6 @@ Route::middleware([
         'students/destroy/{student}',
         [StudentController::class, 'destroy']
     );
-
     // routes for admin
     Route::get(
         'admins',
@@ -355,7 +350,6 @@ Route::middleware([
         'admins/destroy/{admin}',
         [AdminController::class, 'destroy']
     );
-
     // routes for qualifications
     Route::get(
         'students/{student}/courses/{course}/qualifications',
@@ -365,7 +359,6 @@ Route::middleware([
         'students/{student}/courses/{course}/qualifications',
         [QualificationController::class, 'store']
     )->middleware(QualificationValidatorMiddleware::class);
-
     // logout
     Route::post('logout', [AuthController::class, 'logout']);
 });

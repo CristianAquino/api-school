@@ -9,11 +9,9 @@ use App\Models\Enrollement;
 use App\Models\GradeLevel;
 use App\Models\Student;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Faker\Factory as Faker;
-use Illuminate\Support\Facades\DB;
 
 class EnrollementControllerTest extends TestCase
 {
