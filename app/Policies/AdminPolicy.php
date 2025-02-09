@@ -41,7 +41,7 @@ class AdminPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): Response
+    public function store(User $user): Response
     {
         $admin = $user->userable;
         return $user->isGranted(User::ROLE_SUPERADMIN, $admin->role)
@@ -52,9 +52,12 @@ class AdminPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Admin $admin): bool
+    public function update(User $user, Admin $admin): Response
     {
-        return false;
+        $ad = $user->userable;
+        return $user->isGranted(User::ROLE_ADMIN, $ad->role) && $ad->id == $admin->id
+            ? Response::allow()
+            : Response::deny("You do not have the role allowed to perform this action");
     }
 
     /**

@@ -22,6 +22,21 @@ class UserDTO
 
     }
 
+    public static function fromBaseModel($model): self
+    {
+        return new self(
+            $model->name,
+            $model->first_name,
+            $model->second_name,
+            $model->phone,
+            $model->birth_date,
+            $model->address,
+            $model->email,
+            $model->dni,
+            $model->code
+        );
+    }
+
     public static function fromPartialModel($model): array
     {
         $user = self::fromBaseModel($model->user);
@@ -48,20 +63,5 @@ class UserDTO
         return array_map(function ($collection) {
             return self::fromPartialModel($collection);
         }, $collections);
-    }
-
-    public static function fromBaseModel($model): self
-    {
-        return new self(
-            $model->name,
-            $model->first_name,
-            $model->second_name,
-            $model->phone,
-            $model->birth_date,
-            $model->address,
-            $model->email,
-            $model->dni,
-            $model->code
-        );
     }
 }

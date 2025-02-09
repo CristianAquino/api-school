@@ -31,7 +31,8 @@ class UserValidatorMiddleware
             $rules['dni'][] = 'unique:users,dni';
             $rules['email'][] = 'unique:users,email';
         } elseif ($request->isMethod('put') || $request->isMethod('patch')) {
-            $user = $request->route('teacher') ?? $request->route('student');
+            $user = $request->route('admin') ??
+                ($request->route('teacher') ?? $request->route('student'));
             $userId = $user->user ? $user->user->id : null;
             $rules['dni'][] = 'unique:users,dni,' . $userId;
             $rules['email'][] = 'unique:users,email,' . $userId;

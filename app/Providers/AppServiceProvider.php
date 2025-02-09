@@ -8,6 +8,7 @@ use App\Models\Enrollement;
 use App\Models\Grade;
 use App\Models\Level;
 use App\Models\Schedule;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Policies\GeneralPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -37,5 +38,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Schedule::class, GeneralPolicy::class);
         Gate::policy(Teacher::class, GeneralPolicy::class);
         Gate::policy(Enrollement::class, GeneralPolicy::class);
+        Gate::policy(Student::class, GeneralPolicy::class);
     }
 }

@@ -19,7 +19,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('viewAny', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -46,7 +45,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('softList', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -73,7 +71,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('store', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -129,8 +126,11 @@ class AdminController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $teacherDTO = UserDTO::fromPartialModel($user);
-        return response()->json($teacherDTO, Response::HTTP_OK);
+        $adminDTO = UserDTO::fromBaseModel($user->user);
+        return response()->json(
+            array_merge(["id" => $user->id], (array)$adminDTO),
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -139,8 +139,8 @@ class AdminController extends Controller
     public function show(Admin $admin)
     {
         //
-        $admin->load('user');
-        return response()->json($admin, Response::HTTP_OK);
+        $teacherDTO = UserDTO::fromPartialModel($admin);
+        return response()->json($teacherDTO, Response::HTTP_OK);
     }
 
     /**
@@ -149,8 +149,7 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         //
-        $response = Gate::inspect('update', Admin::class);
-
+        $response = Gate::inspect('update', $admin);
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -158,7 +157,6 @@ class AdminController extends Controller
         }
 
         $admin->user()->update($request->validated_data);
-
         return response()->json(["message" => "The admin with code " . $admin->user->code . " has been successfully updated"], Response::HTTP_ACCEPTED);
     }
 
@@ -169,7 +167,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('softDestroy', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -178,7 +175,7 @@ class AdminController extends Controller
 
         $admin->delete();
         return response()->json([
-            "message" => "the admin with code $admin->code has been successfully deleted"
+            "message" => "the admin with code " . $admin->user->code . " has been successfully deleted"
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -189,7 +186,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('restore', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
@@ -217,7 +213,6 @@ class AdminController extends Controller
     {
         //
         $response = Gate::inspect('destroy', Admin::class);
-
         if (!$response->allowed()) {
             return response()->json([
                 "message" => $response->message()
