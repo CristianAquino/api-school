@@ -1,0 +1,1511 @@
+{
+	"info": {
+		"_postman_id": "c3612502-89e6-45c2-ac7d-96d2c968ec74",
+		"name": "api-school",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "40437023"
+	},
+	"item": [
+		{
+			"name": "academic_year",
+			"item": [
+				{
+					"name": "all-academic-years",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/academic_years",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"academic_years"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "20",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-academic-years",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/academic_years/soft_list",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"academic_years",
+								"soft_list"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "academic-year-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/academic_years/1"
+					},
+					"response": []
+				},
+				{
+					"name": "last-year-academic-year",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/academic_years/last_year"
+					},
+					"response": []
+				},
+				{
+					"name": "create-academic-year",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"year\":\"2026\",\r\n    \"start_date\":\"2026/02/28\",\r\n    \"end_date\":\"2026/12/20\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/academic_years"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-academic-year",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/academic_years/restore/2"
+					},
+					"response": []
+				},
+				{
+					"name": "update-academic-year",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"year\":\"2027\",\r\n    \"start_date\":\"2027/12/01\",\r\n    \"end_date\":\"2027/12/20\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/academic_years/2"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-academic-year",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/academic_years/soft_destroy/2"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-academic-year",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/academic_years/destroy/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "level",
+			"item": [
+				{
+					"name": "all-levels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/levels",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"levels"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "level",
+									"value": "sec",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-levels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/levels/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "level-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/levels/1"
+					},
+					"response": []
+				},
+				{
+					"name": "create-level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"High\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"High\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "update-level",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"Low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/3"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-level",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/soft_destroy/1"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-level",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/destroy/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "grade",
+			"item": [
+				{
+					"name": "all-grades-level",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/grades",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"grades"
+							],
+							"query": [
+								{
+									"key": "grade",
+									"value": "w",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-grades",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/grades/soft_list?grade=w",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"grades",
+								"soft_list"
+							],
+							"query": [
+								{
+									"key": "grade",
+									"value": "w"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "grade-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/levels/1/grades/6"
+					},
+					"response": []
+				},
+				{
+					"name": "create-grade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"grade\":\"w\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/1/grades"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-grade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"High\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/grades/restore/8"
+					},
+					"response": []
+				},
+				{
+					"name": "update-grade",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"grade\":\"w\",\r\n    \"level_id\":2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/grades/8"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-grade",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/grades/soft_destroy/1"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-grade",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"grade\":\"A\",\r\n    \"level_id\":7\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/grades/destroy/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course",
+			"item": [
+				{
+					"name": "all-courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/courses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"courses"
+							],
+							"query": [
+								{
+									"key": "course",
+									"value": "dolo",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "6",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/courses/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "course-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/courses/37"
+					},
+					"response": []
+				},
+				{
+					"name": "create-course",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"course\":\"hi\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/levels/1/grades/1/courses"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-course",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"High\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/courses/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "update-course",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"course\":\"hi\",\r\n    \"grade_id\":1,\r\n    \"level_id\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/courses/56"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/courses/soft_destroy/56"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"course\":\"hi, i a new course with description\",\r\n    \"description\":\"i am a description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/courses/destroy/56"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "schedule",
+			"item": [
+				{
+					"name": "all-schedules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/schedules"
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-schedules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/schedules/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "schedule-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/schedules/1"
+					},
+					"response": []
+				},
+				{
+					"name": "schedule-print",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/schedules/print"
+					},
+					"response": []
+				},
+				{
+					"name": "create-schedule",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"start_time\":\"09:00\",\r\n    \"end_time\":\"10:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/schedules"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-schedule",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"High\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/schedules/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "update-schedule",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"start_time\":\"14:00\",\r\n    \"end_time\":\"14:50\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/schedules/8"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-schedule",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/schedules/soft_destroy/3"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-schedule",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"day\":\"monday\",\r\n    \"start_time\":\"09:00\",\r\n    \"end_time\":\"10:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/schedules/destroy/2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "teacher",
+			"item": [
+				{
+					"name": "all-teachers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"teachers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "code",
+									"value": "TE2025",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me-teacher",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/teachers/me"
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-teachers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/teachers/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "teacher-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/teachers/9e24fee2-8d9d-48aa-8a63-ca9c59bb0030"
+					},
+					"response": []
+				},
+				{
+					"name": "create-teacher",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"first\",\r\n    \"first_name\":\"my first name\",\r\n    \"second_name\":\"my second name\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"12345678\",\r\n    \"email\":\"first1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-teacher",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"first\",\r\n    \"first_name\":\"my first name\",\r\n    \"second_name\":\"my second name\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"12345678\",\r\n    \"email\":\"first1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers/restore/9e16fb82-3db2-4d2a-92d6-e1b3105137c2"
+					},
+					"response": []
+				},
+				{
+					"name": "assign-course-teacher",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers/9e16fb82-3db2-4d2a-92d6-e1b3105137c2/courses/4"
+					},
+					"response": []
+				},
+				{
+					"name": "update-teacher",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"first\",\r\n    \"first_name\":\"my first name\",\r\n    \"second_name\":\"my second name\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"12345678\",\r\n    \"email\":\"firstmsmsdmdc@gmail.com\",\r\n    \"birth_date\":\"2020/12/21\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers/9de3ef94-632f-4ae6-84fc-b96f18b9cdc9"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-teacher",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers/soft_destroy/9e24fee2-fdb5-4925-9759-fd958823319f"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-teacher",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"first\",\r\n    \"first_name\":\"my first name\",\r\n    \"second_name\":\"my second name\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"12345678\",\r\n    \"email\":\"firsst@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/teachers/destroy/9e24fee2-fdb5-4925-9759-fd958823319f"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "enrollement",
+			"item": [
+				{
+					"name": "all-enrollements",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/enrollements?page=6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"enrollements"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "6"
+								},
+								{
+									"key": "year",
+									"value": "2025",
+									"disabled": true
+								},
+								{
+									"key": "level",
+									"value": "prim",
+									"disabled": true
+								},
+								{
+									"key": "code",
+									"value": "sT2025001",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-enrollement",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/enrollements/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "enrollement-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/enrollements/9e24fee9-cd37-43fb-b205-dfcda45e7ed2"
+					},
+					"response": []
+				},
+				{
+					"name": "enrollement-print",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/enrollements/print"
+					},
+					"response": []
+				},
+				{
+					"name": "create-enrollement",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"strudent first\",\r\n    \"first_name\":\"my first name student\",\r\n    \"second_name\":\"my second name student\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"324asjsw\",\r\n    \"email\":\"stud@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/enrollements/academic_years/1/grade_level/1"
+					},
+					"response": []
+				},
+				{
+					"name": "create-enrollement-exist-student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/enrollements/academic_years/2/grade_level/2/student/9e24fee9-5e08-4cd5-8a9d-c749d3266cf3"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-enrollement",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"first\",\r\n    \"first_name\":\"my first name\",\r\n    \"second_name\":\"my second name\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"12345678\",\r\n    \"email\":\"first1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/enrollements/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-enrollement",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\":\"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/enrollements/soft_destroy/9e28d6cf-5d8d-471d-9703-3b14f0b133ee"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-enrollement",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"strudent first\",\r\n    \"first_name\":\"my first name student\",\r\n    \"second_name\":\"my second name student\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"32430jsw\",\r\n    \"email\":\"studss@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/enrollements/destroy/9e28d6cf-5d8d-471d-9703-3b14f0b133ee"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "student",
+			"item": [
+				{
+					"name": "all-students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"students"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "code",
+									"value": "st2025001",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me-student",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/students/me"
+					},
+					"response": []
+				},
+				{
+					"name": "report-enrollement-pdf",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/students/pdf"
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/students/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "student-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/students/9e24fee9-5e08-4cd5-8a9d-c749d3266cf3"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "update-student",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"student first first\",\r\n    \"first_name\":\"my first name student\",\r\n    \"second_name\":\"my second name student\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"32432344\",\r\n    \"email\":\"student1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/9df01de5-f6a7-4d8a-9552-654f21927b6c"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-student",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/soft_destroy/1"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-student",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/destroy/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "all-admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/admins",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"admins"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "code",
+									"value": "ad",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me-admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/admins/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"admins",
+								"me"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "code",
+									"value": "ad",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-soft-delete-admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/admins/soft_list"
+					},
+					"response": []
+				},
+				{
+					"name": "admin-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/admins/9e188821-a79e-4afd-a114-bf004529e575"
+					},
+					"response": []
+				},
+				{
+					"name": "create-admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"admin first\",\r\n    \"email\":\"admin2@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/admins"
+					},
+					"response": []
+				},
+				{
+					"name": "restore-admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"strudent first\",\r\n    \"first_name\":\"my first name student\",\r\n    \"second_name\":\"my second name student\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"324asjsw\",\r\n    \"email\":\"stud@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/admins/restore/1"
+					},
+					"response": []
+				},
+				{
+					"name": "update-admin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"student first first\",\r\n    \"first_name\":\"my first name student\",\r\n    \"second_name\":\"my second name student\",\r\n    \"phone\":\"12345678\",\r\n    \"address\":\"av. first second\",\r\n    \"dni\":\"32432344\",\r\n    \"email\":\"student1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/admins/9df01de5-f6a7-4d8a-9552-654f21927b6c"
+					},
+					"response": []
+				},
+				{
+					"name": "soft-destroy-admin",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8000/api/admins/soft_destroy/9de46883-861b-45f0-8877-0aa03897384e"
+					},
+					"response": []
+				},
+				{
+					"name": "destroy-admin",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8000/api/admins/destroy/9de46883-861b-45f0-8877-0aa03897384e"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "qualification",
+			"item": [
+				{
+					"name": "get-qualification",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"admin first\",\r\n    \"email\":\"admin2@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/9e188830-eca3-4a2c-beec-036b55db66c8/courses/18/qualifications"
+					},
+					"response": []
+				},
+				{
+					"name": "get-qualification-print",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"admin first\",\r\n    \"email\":\"admin2@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/qualifications/print"
+					},
+					"response": []
+				},
+				{
+					"name": "post-qualification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number_note\":15,\r\n    \"letter_note\":\"b\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/9e24fef5-5001-4a68-9ca1-cf2667002258/courses/26/qualifications"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\":\"ST20250000\",\r\n    \"password\":\"ST2025000062528422\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/login"
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\":\"AD20250000\",\r\n    \"password\":\"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/logout"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
