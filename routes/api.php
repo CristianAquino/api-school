@@ -183,6 +183,10 @@ Route::middleware([
         [ScheduleController::class, 'softList']
     );
     Route::get(
+        'schedules/print',
+        [ScheduleController::class, 'printSchedule']
+    );
+    Route::get(
         'schedules/{schedule}',
         [ScheduleController::class, 'show']
     );

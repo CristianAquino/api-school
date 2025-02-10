@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Middleware\AuthenticateWithCookie;
 use App\Http\Middleware\JWTMiddleware;
 use App\Models\Schedule;
+use App\Models\Student;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -117,6 +118,24 @@ class ScheduleControllerTest extends TestCase
                 'courses'
             ]
         );
+    }
+
+    public function test_can_print_schedules(): void
+    {
+        $student = Student::inRandomOrder()->first();
+
+        $auth = $this->postJson('/api/login', [
+            "code" => $student->user->code,
+            "password" => $student->user->code . $student->user->dni
+        ]);
+        $token = $auth["token"];
+
+        $response = $this->withHeader("Authorization", "Bearer $token")->getJson(
+            self::BASE_URL . "/print"
+        );
+        // test response
+        $response->assertHeader("content-type", "application/pdf");
+        $response->assertStatus(Response::HTTP_OK);
     }
 
     public function test_can_update_schedule(): void
