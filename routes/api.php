@@ -363,6 +363,10 @@ Route::middleware([
         'students/{student}/courses/{course}/qualifications',
         [QualificationController::class, 'store']
     )->middleware(QualificationValidatorMiddleware::class);
+    Route::get(
+        'qualifications/print',
+        [QualificationController::class, 'printQualification']
+    );
     // logout
     Route::post('logout', [AuthController::class, 'logout']);
 });
