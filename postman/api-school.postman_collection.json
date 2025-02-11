@@ -658,15 +658,6 @@
 					"response": []
 				},
 				{
-					"name": "schedule-print",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "http://localhost:8000/api/schedules/print"
-					},
-					"response": []
-				},
-				{
 					"name": "create-schedule",
 					"request": {
 						"method": "POST",
@@ -1097,6 +1088,15 @@
 			"name": "student",
 			"item": [
 				{
+					"name": "schedule-print",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/schedules/print"
+					},
+					"response": []
+				},
+				{
 					"name": "all-students",
 					"request": {
 						"method": "GET",
@@ -1138,11 +1138,41 @@
 					"response": []
 				},
 				{
-					"name": "report-enrollement-pdf",
+					"name": "print-enrollement",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://localhost:8000/api/students/pdf"
+						"url": "http://localhost:8000/api/students/enrollements/print"
+					},
+					"response": []
+				},
+				{
+					"name": "print-schedule",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/api/students/schedules/print"
+					},
+					"response": []
+				},
+				{
+					"name": "print-qualification",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"admin first\",\r\n    \"email\":\"admin2@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/api/students/qualifications/print"
 					},
 					"response": []
 				},
@@ -1402,7 +1432,7 @@
 			"name": "qualification",
 			"item": [
 				{
-					"name": "get-qualification",
+					"name": "qualification-id",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -1423,28 +1453,7 @@
 					"response": []
 				},
 				{
-					"name": "get-qualification-print",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"admin first\",\r\n    \"email\":\"admin2@gmail.com\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://localhost:8000/api/qualifications/print"
-					},
-					"response": []
-				},
-				{
-					"name": "post-qualification",
+					"name": "create-qualification",
 					"request": {
 						"method": "POST",
 						"header": [],

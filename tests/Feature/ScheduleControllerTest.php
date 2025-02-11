@@ -120,24 +120,6 @@ class ScheduleControllerTest extends TestCase
         );
     }
 
-    public function test_can_print_schedules(): void
-    {
-        $student = Student::inRandomOrder()->first();
-
-        $auth = $this->postJson('/api/login', [
-            "code" => $student->user->code,
-            "password" => $student->user->code . $student->user->dni
-        ]);
-        $token = $auth["token"];
-
-        $response = $this->withHeader("Authorization", "Bearer $token")->getJson(
-            self::BASE_URL . "/print"
-        );
-        // test response
-        $response->assertHeader("content-type", "application/pdf");
-        $response->assertStatus(Response::HTTP_OK);
-    }
-
     public function test_can_update_schedule(): void
     {
         $data = [

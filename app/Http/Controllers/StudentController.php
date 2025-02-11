@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\EnrollementDTO;
+use App\DTOs\QualificationDTO;
+use App\DTOs\ScheduleDTO;
 use App\DTOs\StudentDTO;
 use App\Models\Enrollement;
 use App\Models\Student;
@@ -10,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
@@ -85,6 +88,67 @@ class StudentController extends Controller
 
         $studentDTO = StudentDTO::fromModelWithRelation($enrolle);
         return response()->json($studentDTO, Response::HTTP_OK);
+    }
+
+    /**
+     * Print the specified resource.
+     */
+    public function printEnrollement()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $enrollement = Enrollement::where("student_id", $user->id)->latest("id")->first();
+
+        $enrollementDTO = EnrollementDTO::fromBaseModel($enrollement);
+        $pdf = PDF::loadView('pdf.enrollement', ['enrollement' => $enrollementDTO]);
+        return $pdf->download('enrollement.pdf');
+    }
+
+    /**
+     * Print the specified resource.
+     */
+    public function printSchedule()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $enrollement = Enrollement::where("student_id", $user->id)->latest("id")->first();
+
+        $scheduleDTO = ScheduleDTO::fromPrintModel($enrollement);
+        $pdf = PDF::loadView('pdf.schedule', ['schedule' => $scheduleDTO]);
+        return $pdf->download('schedule.pdf');
+    }
+
+    /**
+     * Print the specified resource.
+     */
+    public function printQualification()
+    {
+        //
+        $me = Auth::user()->userable_id;
+        $user = Student::where('id', $me)->first();
+        if (is_null($user)) {
+            return response()->json([
+                "message" => "You do not have the role allowed to perform this action"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $qualificationDTO = QualificationDTO::fromPrintModel($user);
+        $pdf = PDF::loadView('pdf.qualification', ['qualification' => $qualificationDTO]);
+        return $pdf->download('qualification.pdf');
     }
 
     /**

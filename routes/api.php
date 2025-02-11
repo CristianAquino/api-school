@@ -183,10 +183,6 @@ Route::middleware([
         [ScheduleController::class, 'softList']
     );
     Route::get(
-        'schedules/print',
-        [ScheduleController::class, 'printSchedule']
-    );
-    Route::get(
         'schedules/{schedule}',
         [ScheduleController::class, 'show']
     );
@@ -257,10 +253,6 @@ Route::middleware([
         [EnrollementController::class, 'softList']
     );
     Route::get(
-        'enrollements/print',
-        [EnrollementController::class, 'printEnrollement']
-    );
-    Route::get(
         'enrollements/{enrollement}',
         [EnrollementController::class, 'show']
     );
@@ -308,6 +300,18 @@ Route::middleware([
     Route::delete(
         'students/soft_destroy/{student}',
         [StudentController::class, 'softDestroy']
+    );
+    Route::get(
+        'students/enrollements/print',
+        [StudentController::class, 'printEnrollement']
+    );
+    Route::get(
+        'students/schedules/print',
+        [StudentController::class, 'printSchedule']
+    );
+    Route::get(
+        'students/qualifications/print',
+        [StudentController::class, 'printQualification']
     );
     Route::post(
         'students/restore/{student}',
@@ -363,10 +367,6 @@ Route::middleware([
         'students/{student}/courses/{course}/qualifications',
         [QualificationController::class, 'store']
     )->middleware(QualificationValidatorMiddleware::class);
-    Route::get(
-        'qualifications/print',
-        [QualificationController::class, 'printQualification']
-    );
     // logout
     Route::post('logout', [AuthController::class, 'logout']);
 });

@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\ScheduleDTO;
-use App\Models\Enrollement;
 use App\Models\Schedule;
-use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ScheduleController extends Controller
 {
@@ -61,27 +57,6 @@ class ScheduleController extends Controller
         return response()->json([
             "message" => "Schedule created successfully"
         ], Response::HTTP_CREATED);
-    }
-
-    /**
-     * Print the specified resource.
-     */
-    public function printSchedule()
-    {
-        //
-        $me = Auth::user()->userable_id;
-        $user = Student::where('id', $me)->first();
-        if (is_null($user)) {
-            return response()->json([
-                "message" => "You do not have the role allowed to perform this action"
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $enrollement = Enrollement::where("student_id", $user->id)->latest("id")->first();
-
-        $scheduleDTO = ScheduleDTO::fromPrintModel($enrollement);
-        $pdf = PDF::loadView('pdf.schedule', ['schedule' => $scheduleDTO]);
-        return $pdf->download('schedule.pdf');
     }
 
     /**

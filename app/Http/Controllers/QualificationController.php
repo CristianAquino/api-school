@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTOs\QualificationDTO;
 use App\Models\Course;
 use App\Models\Enrollement;
 use App\Models\Qualification;
@@ -12,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class QualificationController extends Controller
 {
@@ -114,25 +112,6 @@ class QualificationController extends Controller
         } else {
             return response()->json(["message" => "Qualification not found"], Response::HTTP_NOT_FOUND);
         }
-    }
-
-    /**
-     * Print the specified resource.
-     */
-    public function printQualification()
-    {
-        //
-        $me = Auth::user()->userable_id;
-        $user = Student::where('id', $me)->first();
-        if (is_null($user)) {
-            return response()->json([
-                "message" => "You do not have the role allowed to perform this action"
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $qualificationDTO = QualificationDTO::fromPrintModel($user);
-        $pdf = PDF::loadView('pdf.qualification', ['qualification' => $qualificationDTO]);
-        return $pdf->download('qualification.pdf');
     }
 
     /**

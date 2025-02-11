@@ -9,10 +9,8 @@ use App\Models\GradeLevel;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class EnrollementController extends Controller
 {
@@ -210,27 +208,6 @@ class EnrollementController extends Controller
 
         $enrollementDTO = EnrollementDTO::fromBaseModel($enrollement);
         return response()->json($enrollementDTO, Response::HTTP_OK);
-    }
-
-    /**
-     * Print the specified resource.
-     */
-    public function printEnrollement()
-    {
-        //
-        $me = Auth::user()->userable_id;
-        $user = Student::where('id', $me)->first();
-        if (is_null($user)) {
-            return response()->json([
-                "message" => "You do not have the role allowed to perform this action"
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $enrollement = Enrollement::where("student_id", $user->id)->latest("id")->first();
-
-        $enrollementDTO = EnrollementDTO::fromBaseModel($enrollement);
-        $pdf = PDF::loadView('pdf.enrollement', ['enrollement' => $enrollementDTO]);
-        return $pdf->download('enrollement.pdf');
     }
 
     /**

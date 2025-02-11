@@ -169,26 +169,6 @@ class EnrollementControllerTest extends TestCase
         );
     }
 
-    public function test_can_print_enrollement(): void
-    {
-        $student = Student::inRandomOrder()->first();
-
-        $auth = $this->postJson('/api/login', [
-            "code" => $student->user->code,
-            "password" => $student->user->code . $student->user->dni
-        ]);
-        $token = $auth["token"];
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson(
-            self::BASE_URL . "/print"
-        );
-
-        $response->assertHeader("content-type", "application/pdf");
-        $response->assertStatus(Response::HTTP_OK);
-    }
-
     public function test_can_soft_destroy_enrollement(): void
     {
         $message = [

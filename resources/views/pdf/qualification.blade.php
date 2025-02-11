@@ -72,10 +72,10 @@
                             <td style="text-align: center">{{$loop->index +1}}</th>
                             <td>{{$course["course"]}}</td>
                             @foreach ($course["notes"] as $note)
-                                <td>{{$note->number_note}}</td>
+                                <td style="text-align: center">{{$note->number_note}}</td>
                                 @php $avg += $note->avg; @endphp
                             @endforeach
-                            <td>{{$avg}}</td>
+                            <td style="text-align: center">{{$avg}}</td>
                         </tr>
                     @endforeach
                 </table>
