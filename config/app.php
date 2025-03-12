@@ -123,4 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    // variable para obtener el promedio de notas
+    'avg_note' => env('AVG_NOTE', 3)
+
 ];

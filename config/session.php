@@ -129,7 +129,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
 
     /*
@@ -169,6 +169,7 @@ return [
     |
     */
 
+    // cambiar a true para que solo sea enviado por https
     'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*
